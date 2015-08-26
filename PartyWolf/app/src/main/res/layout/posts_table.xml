@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    >
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/main_list_view"
+        android:layout_below="@id/topBar">
+    </ListView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#00A9FF"
+        android:id="@+id/topBar"
+        />
+
+    <ImageButton
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:scaleType="fitXY"
+        android:id="@+id/newPostButton"
+        android:layout_marginTop="2dp"
+        android:background="@drawable/plus"
+        android:textSize="30dp"
+        android:textColor="#ffffff"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="14dp"
+        style="?android:attr/borderlessButtonStyle"
+        />
+
+    <ImageButton
+        android:layout_width="33dp"
+        android:layout_height="25dp"
+        android:layout_margin="13dp"
+        android:scaleType="fitXY"
+        android:id="@+id/settingsButton"
+        android:src="@drawable/settings"
+        android:tint="#ffffff"
+        android:layout_marginTop="4dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        style="?android:attr/borderlessButtonStyle"
+        />
+
+    <Button
+        android:layout_width="70dp"
+        android:layout_height="39dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Hype"
+        android:textColor="#ffffff"
+        android:textSize="20dp"
+        android:gravity="center"
+        android:id="@+id/hypeOption"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="7dp"
+        android:layout_marginRight="105dp"
+        android:paddingBottom="2dp"
+        android:background="@drawable/selection_blank_bg"
+        />
+
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="39dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Date"
+        android:textColor="#ffffff"
+        android:textSize="20dp"
+        android:gravity="center"
+        android:id="@+id/dateOption"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="7dp"
+        android:layout_marginLeft="105dp"
+        android:paddingBottom="2dp"
+        android:background="@drawable/selection_bg"
+        />
+
+</RelativeLayout>

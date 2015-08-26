@@ -1,0 +1,84 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/main_layout">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:id="@+id/first_layout">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="35dp"
+            android:orientation="horizontal"
+            android:background="@color/ColorPrimary">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:src="@drawable/settings"
+                android:layout_marginRight="52dp"
+                android:layout_marginLeft="5dp"
+                android:background="@null"
+                android:onClick="openSettings"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:id="@+id/date"
+                android:text="@string/date"
+                android:background="@drawable/blue_button"
+                style="@style/button_text_white"
+                android:layout_marginLeft="10dp"
+                android:onClick="openDate"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:id="@+id/hype"
+                android:text="@string/hype"
+                android:background="@drawable/white_button"
+                style="@style/button_text_blue" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:src="@drawable/plus"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="52dp"
+                android:background="@null"
+                android:onClick="openAdd"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/Grey"
+            android:textColor="@color/Black"
+            android:text="@string/events_sorted"
+            android:textSize="19dp"
+            android:textStyle="bold"
+            android:paddingBottom="3dp"
+            android:paddingTop="3dp"
+            android:paddingLeft="5dp"/>
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:id="@+id/second_layout">
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

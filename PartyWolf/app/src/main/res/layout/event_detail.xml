@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#00A9FF"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="New Event"
+        android:textColor="#ffffff"
+        android:textSize="24dp"
+        android:gravity="center"
+        />
+
+    <ImageView
+        android:id="@+id/eventbg"
+        android:layout_width="match_parent"
+        android:layout_height="215dp"
+        android:background="@drawable/eventbg"
+        android:layout_below="@+id/topBar"/>
+
+    <TextView
+        android:id="@+id/event_detail_title"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@id/topBar"
+        android:layout_marginTop="10dp"
+        android:text="Title"
+        android:textColor="#ffff"
+        android:gravity="center"
+        android:textSize="30dp"
+        />
+
+    <TextView
+        android:id="@+id/event_detail_host"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_below="@id/event_detail_title"
+        android:text="by (Name)"
+        android:gravity="center"
+        android:textColor="#ffffff"
+        android:textSize="16dp"
+        />
+
+    <TextView
+        android:id="@+id/event_detail_location"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_below="@id/event_detail_host"
+        android:text="Location"
+        android:gravity="center"
+        android:textColor="#ffffff"
+        android:textSize="16dp"/>
+
+    <TextView
+        android:id="@+id/event_detail_emoji"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@id/event_detail_location"
+        android:text="emoji"
+        android:layout_margin="15dp"
+        android:gravity="center"
+        android:textColor="#ffffff"
+        android:textSize="32dp"/>
+
+    <TextView
+        android:id="@+id/event_detail_date"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_below="@id/event_detail_emoji"
+        android:text="Date and Time"
+        android:gravity="center"
+        android:textColor="#ffffff"
+        android:textSize="16dp"/>
+
+    <TextView
+        android:id="@+id/event_detail_gender_text"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/eventbg"
+        android:text="Gender \u0026 Class Breakdown"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:textSize="22dp"/>
+
+    <!--<ImageView
+        android:id="@+id/event_detail_graphs"
+        android:layout_width="match_parent"
+        android:layout_height="125dp"
+        android:layout_below="@id/event_detail_gender_text"/>-->
+
+    <LinearLayout
+        android:id="@+id/event_detail_graphs_layout"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_below="@id/event_detail_gender_text"
+        android:weightSum="2">
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/event_detail_graphs_gender"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginLeft="17dp"
+            />
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/event_detail_graphs_class"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginRight="17dp"
+            />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/event_detail_number_friends"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/event_detail_graphs_layout"
+        android:text="0 friends hyped this event"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:textSize="22dp"
+        />
+
+
+    <HorizontalScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/event_detail_number_friends"
+        android:paddingLeft="25dp"
+        android:scrollbars="none">
+        <LinearLayout
+            android:id="@+id/event_detail_friend_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!--
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button 1"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button 2"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button 3"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button 4"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button 5"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button 6"/>
+            -->
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+</RelativeLayout>

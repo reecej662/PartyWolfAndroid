@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#00A9FF"
+        android:id="@+id/topBar"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="New Event"
+        android:textColor="#ffffff"
+        android:textSize="24dp"
+        android:gravity="center"
+        />
+
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Event Name"
+        android:textSize="24dp"
+        android:padding="8dp"
+        android:layout_below="@id/topBar" />
+
+    <EditText
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:hint="Other things such as day, time, type of food, theme of party, etc..."
+        android:textSize="24dp"
+        android:gravity="top"
+        android:padding="8dp"
+        android:layout_below="@id/name"/>
+
+    <EditText
+        android:id="@+id/cost"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="$0.00"
+        android:textSize="24dp"
+        android:padding="8dp"
+        android:layout_below="@id/description"
+        />
+
+    <EditText
+        android:id="@+id/host"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Presented/Hosted By"
+        android:textSize="24dp"
+        android:padding="8dp"
+        android:layout_marginTop="-1dp"
+        android:layout_below="@id/cost"/>
+
+    <DatePicker
+        android:id="@+id/datePicker"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:padding="8dp"
+        android:layout_below="@id/host"></DatePicker>
+
+</RelativeLayout>

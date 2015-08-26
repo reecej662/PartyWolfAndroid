@@ -1,0 +1,383 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="35dp"
+            android:orientation="horizontal"
+            android:background="@color/ColorPrimary">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:src="@drawable/settings"
+                android:layout_marginRight="52dp"
+                android:layout_marginLeft="5dp"
+                android:background="@null"
+                android:onClick="openSettings"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:id="@+id/date"
+                android:text="@string/date"
+                android:background="@drawable/blue_button"
+                style="@style/button_text_white"
+                android:layout_marginLeft="10dp"
+                android:onClick="openDate"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:id="@+id/hype"
+                android:text="@string/hype"
+                android:background="@drawable/blue_button"
+                style="@style/button_text_white"
+                android:onClick="openHype"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:src="@drawable/plus"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="52dp"
+                android:background="@null"
+                android:onClick="openAdd"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/slate_gray"
+            android:text="@string/my_account"
+            android:textSize="15dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:paddingLeft="13dp"/>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/profile"
+                android:orientation="horizontal">
+            </LinearLayout>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/slate_gray"
+            android:text="@string/notify_me"
+            android:textSize="15dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:paddingLeft="13dp"/>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.2dp"
+            android:visibility="visible"
+            android:background="@color/slate_gray"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal"
+            android:background="@color/White">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="On my accepted/rejected submission"
+                android:textSize="15dp"
+                android:textColor="@color/Black"
+                android:paddingLeft="15dp"
+                android:layout_gravity="center_vertical"/>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:layout_gravity="center_vertical"
+                android:paddingRight="15dp">
+
+                <Switch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/first_notification" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.2dp"
+            android:visibility="visible"
+            android:layout_marginLeft="15dp"
+            android:background="@color/slate_gray"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal"
+            android:background="@color/White">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upon any new events"
+                android:textSize="15dp"
+                android:textColor="@color/Black"
+                android:paddingLeft="15dp"
+                android:layout_gravity="center_vertical"/>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:layout_gravity="center_vertical"
+                android:paddingRight="15dp">
+
+                <Switch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/second_notification"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.2dp"
+            android:visibility="visible"
+            android:layout_marginLeft="15dp"
+            android:background="@color/slate_gray" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:background="@color/White">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="When an event hits a certain hype"
+            android:textSize="15dp"
+            android:textColor="@color/Black"
+            android:paddingLeft="15dp"
+            android:layout_gravity="center_vertical"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical"
+            android:paddingRight="15dp">
+
+            <NumberPicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/on_number">
+            </NumberPicker>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.2dp"
+            android:visibility="visible"
+            android:background="@color/slate_gray"/>
+
+
+
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/slate_gray"
+            android:text="@string/other_stuff"
+            android:textSize="15dp"
+            android:paddingBottom="12dp"
+            android:paddingTop="12dp"
+            android:paddingLeft="13dp"/>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.2dp"
+            android:visibility="visible"
+            android:background="@color/slate_gray"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal"
+            android:background="@color/White">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Privacy"
+                android:textSize="15dp"
+                android:textColor="@color/Black"
+                android:paddingLeft="15dp"
+                android:layout_gravity="center_vertical"/>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:layout_gravity="center_vertical"
+                android:paddingRight="28dp">
+
+                <ImageButton
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/blackplus"
+                    android:background="@color/White"
+                    android:id="@+id/privacy"
+                    android:onClick="openPrivacy"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.2dp"
+            android:visibility="visible"
+            android:layout_marginLeft="15dp"
+            android:background="@color/slate_gray"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal"
+            android:background="@color/White">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Terms of Service"
+                android:textSize="15dp"
+                android:textColor="@color/Black"
+                android:paddingLeft="15dp"
+                android:layout_gravity="center_vertical"/>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:layout_gravity="center_vertical"
+                android:paddingRight="28dp">
+
+                <ImageButton
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/blackplus"
+                    android:background="@color/White"
+                    android:id="@+id/terms_of_service"
+                    android:onClick="openTermsOfService"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.2dp"
+            android:visibility="visible"
+            android:layout_marginLeft="15dp"
+            android:background="@color/slate_gray" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal"
+            android:background="@color/White">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Contact Us"
+                android:textSize="15dp"
+                android:textColor="@color/Black"
+                android:paddingLeft="15dp"
+                android:layout_gravity="center_vertical"/>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:layout_gravity="center_vertical"
+                android:paddingRight="28dp">
+
+                <ImageButton
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/blackplus"
+                    android:background="@color/White"
+                    android:id="@+id/contact_us"
+                    android:onClick="openContactUs"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.2dp"
+            android:visibility="visible"
+            android:layout_marginLeft="15dp"
+            android:background="@color/slate_gray"/>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="45dp"
+        android:orientation="horizontal"
+        android:background="@color/White">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/log_out"
+            android:text="@string/log_out"
+            android:textColor="@color/ColorPrimary"
+            android:gravity="center"
+            android:background="@color/White"
+            android:onClick="logOut"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.2dp"
+            android:visibility="visible"
+            android:background="@color/slate_gray"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Made with ♥ by AloaLabs (version 0.1)"
+            android:textColor="@color/slate_gray"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp"/>
+
+    </LinearLayout>
+
+</ScrollView>

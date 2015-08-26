@@ -1,0 +1,183 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/ColorPrimary">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:text="@string/cancel"
+            android:id="@+id/cancel"
+            android:background="@android:color/transparent"
+            style="@style/add_button_text_white"
+            android:onClick="openPrevious" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/new_post"
+            android:text="@string/new_post"
+            android:background="@drawable/blue_blue_button"
+            style="@style/new_post"
+            android:textSize="20dp"
+            android:paddingBottom="10dp"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:text="@string/submit"
+            android:id="@+id/post"
+            android:background="@android:color/transparent"
+            style="@style/add_button_text_white"
+            android:onClick="newPost"
+            android:visibility="invisible"/>
+
+    </LinearLayout>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/event_name_title"
+        android:id="@+id/event_name_title"
+        android:textColorHint="#d3d3d3"
+        android:textColor="@color/Black"
+        android:singleLine="true"
+        android:nextFocusDown="@+id/event_description"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:hint="@string/event_description"
+        android:id="@+id/event_description"
+        android:textColorHint="#d3d3d3"
+        android:textColor="@color/Black"
+        android:gravity="top"
+        android:layout_weight="1"
+        android:singleLine="true"
+        android:nextFocusDown="@+id/horizontal_layout"/>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_vertical"
+        android:id="@+id/horizontal_layout"
+        android:nextFocusRight="@+id/fee">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fee"
+            android:text="@string/fee"
+            android:textColorHint="#d3d3d3"
+            android:textColor="@color/Black"
+            android:singleLine="true"
+            android:nextFocusDown="@+id/one_emoji" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/on_campus"
+                android:textColor="@color/Black"
+                android:singleLine="true"
+                android:gravity="right"
+                android:paddingRight="5dp"/>
+
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/on_campus"
+                android:paddingRight="10dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="@string/one_emoji"
+            android:id="@+id/one_emoji"
+            android:textColorHint="#d3d3d3"
+            android:textColor="@color/Black"
+            android:layout_weight="5"
+            android:singleLine="true"
+            android:nextFocusDown="@+id/presented_by"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="@string/presented_by"
+            android:id="@+id/presented_by"
+            android:textColorHint="#d3d3d3"
+            android:textColor="@color/Black"
+            android:layout_weight="2"
+            android:singleLine="true"
+            android:nextFocusDown="@+id/new_date"/>
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/new_date"
+        android:id="@+id/new_date"
+        android:background="#73e773"
+        style="@style/add_button_text_white"
+        android:onClick="setDate"/>
+
+    <DatePicker
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/eventDate"
+        android:visibility="gone"
+        android:headerBackground="@color/ColorPrimary" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/new_time"
+        android:id="@+id/new_time"
+        android:background="#73e773"
+        style="@style/add_button_text_white"
+        android:onClick="setTime"
+        android:visibility="gone"/>
+
+    <TimePicker
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/eventTime"
+        android:visibility="gone"
+        android:headerBackground="@color/ColorPrimary"/>
+
+</LinearLayout>
