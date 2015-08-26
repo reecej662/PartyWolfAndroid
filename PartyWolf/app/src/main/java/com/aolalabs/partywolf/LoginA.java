@@ -17,7 +17,6 @@ import android.widget.ImageButton;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
-import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
@@ -50,12 +49,12 @@ public class LoginA extends Activity implements OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FacebookSdk.sdkInitialize(this);
+        //FacebookSdk.sdkInitialize(this);
         setContentView(R.layout.activity_login);
         //Parse.enableLocalDatastore(this);
         //Parse.initialize(this, "8IiZUWr2nVlthlX1VVrq3gDHXMfuhefW3EIbBdzE", "TNc5sg3go9lqQBcdizIZvgwa3wmXrDPo0D7txBTT");
-        ParseFacebookUtils.initialize(this);
-        ParseUser.enableRevocableSessionInBackground();
+        //ParseFacebookUtils.initialize(this);
+        //ParseUser.enableRevocableSessionInBackground();
 
         Button learnMoreButton = (Button) findViewById(R.id.learnMoreButton);
         ImageButton fbLoginButton = (ImageButton) findViewById(R.id.fbLoginButton);

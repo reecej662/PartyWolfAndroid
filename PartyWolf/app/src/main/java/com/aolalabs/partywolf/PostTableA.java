@@ -21,7 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -68,9 +67,9 @@ public class PostTableA extends Activity implements OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstance) {
         // Enable Local Datastore.
-        Parse.enableLocalDatastore(this);
+        // Parse.enableLocalDatastore(this);
 
-        Parse.initialize(this, "8IiZUWr2nVlthlX1VVrq3gDHXMfuhefW3EIbBdzE", "TNc5sg3go9lqQBcdizIZvgwa3wmXrDPo0D7txBTT");
+        // Parse.initialize(this, "8IiZUWr2nVlthlX1VVrq3gDHXMfuhefW3EIbBdzE", "TNc5sg3go9lqQBcdizIZvgwa3wmXrDPo0D7txBTT");
 
         super.onCreate(savedInstance);
         setContentView(R.layout.posts_table);
@@ -332,7 +331,7 @@ public class PostTableA extends Activity implements OnClickListener{
         Intent i;
         switch(v.getId()) {
             case R.id.newPostButton:
-                i = new Intent(this, NewPostA.class);
+                i = new Intent(this, Add.class);
                 startActivity(i);
                 break;
             case R.id.dateOption:
