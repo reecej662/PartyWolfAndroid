@@ -68,6 +68,7 @@ public class PostTableA extends Activity implements OnClickListener{
     private boolean dateView = true;
     private ParseUser currentUser = null;
     private Dialog loadingDialog = null;
+    private LocationManager locationManager;
     private Location userLocation = null;
 
     @Override
@@ -83,10 +84,10 @@ public class PostTableA extends Activity implements OnClickListener{
         loadingDialog = showLoadingDialog();
         loadingDialog.show();
 
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         populateEventList();
         populateListView((ArrayList<Event>) events);
         registerClickCallback();
-
 
         newPostButton = (ImageButton) findViewById(R.id.newPostButton);
         eventList = (ListView) findViewById(R.id.main_list_view);
@@ -248,8 +249,6 @@ public class PostTableA extends Activity implements OnClickListener{
                 } else {
                     clickedEvent = sortedEvents.get(position);
                 }
-                String message = "You clicked on " + clickedEvent.getTitle();
-                System.out.println(message);
                 Intent i = new Intent(PostTableA.this, EventDetailA.class);
                 i.putExtra("event", clickedEvent);
                 startActivity(i);
@@ -329,7 +328,6 @@ public class PostTableA extends Activity implements OnClickListener{
                 button.setTextColor(Color.rgb(0, 0, 0));
                 button.setBackgroundResource(R.drawable.vote);
                 button.setText("vote");
-                System.out.println(currentEvent.getTitle() + " not upvoted");
             }
 
             loadingDialog.dismiss();
@@ -353,12 +351,6 @@ public class PostTableA extends Activity implements OnClickListener{
                 dateView = true;
                 populateListView((ArrayList<Event>) events);
                 registerClickCallback();
-                try {
-                    System.out.println("User: " + currentUser.getString("first_name") + " onNew: " + currentUser.getBoolean("onNew"));
-                } catch (Exception e) {
-                    System.err.println("Tried to get something " + e);
-                }
-
                 break;
             case R.id.hypeOption:
                 v.setBackgroundResource(R.drawable.selection_bg);
@@ -367,16 +359,8 @@ public class PostTableA extends Activity implements OnClickListener{
                 sortByHype();
                 populateListView((ArrayList<Event>) sortedEvents);
                 registerClickCallback();
-                try {
-                    System.out.println("User: " + currentUser.getString("first_name") + " onNew: " + currentUser.getBoolean("onNew"));
-                } catch (Exception e) {
-                    System.err.println("Tried to get something " + e);
-                }
-
                 break;
             case R.id.settingsButton:
-                /*i = new Intent(this, EventDetailLoadingA.class);
-                startActivity(i);*/
                 i = new Intent(this, Settings.class);
                 startActivity(i);
                 break;
@@ -430,8 +414,6 @@ public class PostTableA extends Activity implements OnClickListener{
     public Event userUpvoted(Event event) {
         for(Event upvoted : upvoteEvents) {
             if(event.getObjectID().equals(upvoted.getObjectID())){
-                System.out.println("Upvoted title: " + upvoted.getTitle());
-                System.out.println("I Found an upvoted event");
                 return upvoted;
             }
         }
@@ -447,17 +429,12 @@ public class PostTableA extends Activity implements OnClickListener{
 
             for (Event event : events) {
                 if ((upvotedEvent = userUpvoted(event)) != null) {
-                    System.out.println("Event removed");
                     event.unvote();
                     upvoteEvents.remove(upvotedEvent);
-
-                    //hypeButton.setText("vote");
                 }
             }
 
-            System.out.println(upvoteEvents.size());
             upvoteObjects.remove(object);
-            System.out.println(upvoteEvents.size());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -483,10 +460,8 @@ public class PostTableA extends Activity implements OnClickListener{
     public void upvoteEvent(ParseObject object) {
 
         try {
-            System.out.println("On New:" + currentUser.getBoolean("onNew"));
             object.increment("upvotes", 1);
 
-            System.out.println("I should be doing something");
             // Get the coresponding event in the local array and add to the upvoted list
             for (Event event : events) {
                 if (event.getObjectID().equals(object.getObjectId())) {
@@ -500,8 +475,6 @@ public class PostTableA extends Activity implements OnClickListener{
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            System.out.println("New upvote number: " + object.getInt("upvotes"));
-            System.out.println(object.getObjectId());
 
             currentUser.put("upvote_data", upvoteObjects);
             currentUser.saveInBackground(new SaveCallback() {
@@ -542,13 +515,11 @@ public class PostTableA extends Activity implements OnClickListener{
 
     public void getLocation() {
 
-        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                System.out.println("Longitude: " + location.getLongitude() + " Latitude: " + location.getLatitude());
                 userLocation = location;
                 loadUpvoteData();
             }
@@ -576,18 +547,26 @@ public class PostTableA extends Activity implements OnClickListener{
     public boolean eventInArea(ParseObject object) {
 
         ParseGeoPoint eventLocation = object.getParseGeoPoint("postLocation");
+        try {
+            System.out.println("Latitude: " + this.userLocation.getLatitude() + " Longitude: " + this.userLocation.getLongitude());
+        } catch (Exception e) {
+            this.userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            System.out.println("Used last known location");
+        }
+
         ParseGeoPoint userLocation = new ParseGeoPoint(this.userLocation.getLatitude(), this.userLocation.getLongitude());
 
         Double distance = eventLocation.distanceInMilesTo(userLocation);
         System.out.println(this.userLocation);
         System.out.println(distance);
 
-        if (eventLocation.distanceInMilesTo(userLocation) < 10) {
+        if (distance < 10) {
             return (true);
         } else {
             return (false);
         }
 
     }
+
 
 }
