@@ -2,9 +2,13 @@ package com.aolalabs.partywolf;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +26,7 @@ import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
@@ -63,6 +68,7 @@ public class PostTableA extends Activity implements OnClickListener{
     private boolean dateView = true;
     private ParseUser currentUser = null;
     private Dialog loadingDialog = null;
+    private Location userLocation = null;
 
     @Override
     protected void onCreate(Bundle savedInstance) {
@@ -80,6 +86,7 @@ public class PostTableA extends Activity implements OnClickListener{
         populateEventList();
         populateListView((ArrayList<Event>) events);
         registerClickCallback();
+
 
         newPostButton = (ImageButton) findViewById(R.id.newPostButton);
         eventList = (ListView) findViewById(R.id.main_list_view);
@@ -100,7 +107,7 @@ public class PostTableA extends Activity implements OnClickListener{
             if(currentUser == null) {
                 startActivity(login);
             } else {
-                loadUpvoteData();
+                getLocation();
             }
         } catch (Exception e) {
             startActivity(login);
@@ -112,9 +119,10 @@ public class PostTableA extends Activity implements OnClickListener{
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        //Parse.enableLocalDatastore(this);
+    protected void onResume() {
+        super.onResume();
+        loadUpvoteData();
+        System.out.println("Resuming activity");
     }
 
     //9722610049
@@ -198,8 +206,13 @@ public class PostTableA extends Activity implements OnClickListener{
                 try {
                     if (e == null) {
                         for (ParseObject object : postList) {
-                            events.add(new Event(object));
-                            parseEvents.add(object);
+                            if((eventInArea(object) && !object.getBoolean("onCampus"))
+                                    || (currentUser.get("university").equals(object.get("university")))) {
+                                events.add(new Event(object));
+                                parseEvents.add(object);
+                            } else {
+                                System.out.println("Event not in local area");
+                            }
                         }
                     } else {
                         e.printStackTrace();
@@ -523,6 +536,58 @@ public class PostTableA extends Activity implements OnClickListener{
         loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
         return loadingDialog;
+    }
+
+
+
+    public void getLocation() {
+
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+
+        LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                System.out.println("Longitude: " + location.getLongitude() + " Latitude: " + location.getLatitude());
+                userLocation = location;
+                loadUpvoteData();
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+
+    }
+
+    public boolean eventInArea(ParseObject object) {
+
+        ParseGeoPoint eventLocation = object.getParseGeoPoint("postLocation");
+        ParseGeoPoint userLocation = new ParseGeoPoint(this.userLocation.getLatitude(), this.userLocation.getLongitude());
+
+        Double distance = eventLocation.distanceInMilesTo(userLocation);
+        System.out.println(this.userLocation);
+        System.out.println(distance);
+
+        if (eventLocation.distanceInMilesTo(userLocation) < 10) {
+            return (true);
+        } else {
+            return (false);
+        }
+
     }
 
 }

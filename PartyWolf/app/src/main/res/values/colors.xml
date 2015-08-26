@@ -8,6 +8,7 @@
     <color name="slate_gray">#aa708090</color>
     <color name="slate_gray_solid">#708090</color>
     <color name="Black">#000000</color>
+    <color name="GrayBackground">#EFEFF4</color>
 
 
     <color name="colorPrimary">#FFFFFF</color>
