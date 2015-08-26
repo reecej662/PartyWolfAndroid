@@ -2,11 +2,20 @@ package com.aolalabs.partywolf;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.Switch;
+import android.widget.TextView;
 
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 public class Settings extends Activity {
@@ -18,6 +27,7 @@ public class Settings extends Activity {
     private Boolean onStatus;
     private Integer onHype;
     private ParseUser currentUser = null;
+    private ImageView profilePicture = null;
 
     NumberPicker noPicker = null;
 
@@ -32,6 +42,14 @@ public class Settings extends Activity {
         noPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
         currentUser = ParseUser.getCurrentUser();
         userId = currentUser.getObjectId();
+
+        Button doneButton = (Button) findViewById(R.id.doneButton);
+        doneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     protected void onStart(){
@@ -46,6 +64,7 @@ public class Settings extends Activity {
         Switch firstSwitch = (Switch) findViewById(R.id.first_notification);
         Switch secondSwitch = (Switch) findViewById(R.id.second_notification);
         NumberPicker onNewHype = (NumberPicker) findViewById(R.id.on_number);
+        profilePicture = (ImageView) findViewById(R.id.userProfilePic);
 
 
         if (onNew) {
@@ -103,6 +122,48 @@ public class Settings extends Activity {
         //Check status of switches upon activity start up
         initialFirstCheck = firstSwitch.isChecked();
         initialSecondCheck = secondSwitch.isChecked();
+
+        setContent();
+    }
+
+    private void setContent() {
+        // Set the profile picture
+        try {
+            ParseFile profilePictureFile = (ParseFile) currentUser.get("profile_pic");
+
+            profilePictureFile.getDataInBackground(new GetDataCallback() {
+                @Override
+                public void done(byte[] data, ParseException e) {
+
+                    if (e == null)
+                    {
+                        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                        RoundImage roundImage = new RoundImage(bmp);
+                        profilePicture.setImageBitmap(bmp);
+                    }
+                    else
+                    {
+                        // Set a default profile picture
+                    }
+
+                }
+            });
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+
+        TextView location = (TextView) findViewById(R.id.userLocation);
+        TextView school = (TextView) findViewById(R.id.schoolName);
+        TextView classYear = (TextView) findViewById(R.id.userClass);
+
+        ParseObject universityPointer = (ParseObject) currentUser.get("university");
+
+        location.setText(currentUser.getString("currentCity"));
+        school.setText(universityPointer.getString("name"));
+        classYear.setText("Class of " + currentUser.getNumber("classOf").toString()) ;
+
+        // Set the name
+        //name.setText(friend.getString("first_name"));
     }
 
     public void openHype(View view){
@@ -142,7 +203,7 @@ public class Settings extends Activity {
 
     public void logOut (View view) {
         ParseUser.logOut();
-        Intent intent = new Intent(this, Login.class);
+        Intent intent = new Intent(this, LoginA.class);
         startActivity(intent);
     }
 

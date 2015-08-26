@@ -26,7 +26,7 @@
     <string name="learn_more">Learn More</string>
     <string name="title_activity_learn__more">Learn_More</string>
     <string name="password_again">Please Re-Enter Your Password</string>
-    <string name="log_out">Log Out</string>
+    <string name="log_out">Logout</string>
     <string name="cancel">Cancel</string>
     <string name="new_post">New Post</string>
     <string name="submit">Submit</string>

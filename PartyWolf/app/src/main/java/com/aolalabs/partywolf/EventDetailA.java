@@ -64,6 +64,7 @@ public class EventDetailA extends Activity {
         TextView date = (TextView) findViewById(R.id.event_detail_date);
         friendView = (LinearLayout) findViewById(R.id.event_detail_friend_container);
 
+
         /*
 
         1. Get chart from the view (onCreate)

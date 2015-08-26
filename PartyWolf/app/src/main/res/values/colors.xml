@@ -5,7 +5,8 @@
     <color name="ColorPrimaryDark">#00A9ff</color>
     <color name="White">#ffffff</color>
     <color name="Grey">#d3d3d3</color>
-    <color name="slate_gray">#708090</color>
+    <color name="slate_gray">#aa708090</color>
+    <color name="slate_gray_solid">#708090</color>
     <color name="Black">#000000</color>
 
 

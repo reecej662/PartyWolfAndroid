@@ -1,79 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    >
+
+<RelativeLayout
+    android:id="@+id/topBar"
+    android:layout_width="fill_parent"
+    android:layout_height="50dp"
+    android:orientation="horizontal"
+    android:background="@color/ColorPrimary">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:scaleType="fitXY"
+        android:id="@+id/doneButton"
+        android:text="Done"
+        android:textColor="#ffffff"
+        android:layout_marginTop="5dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        style="?android:attr/borderlessButtonStyle"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="Settings"
+        android:textSize="20dp"
+        android:textColor="#ffffff"
+        android:layout_margin="13dp"/>
+
+</RelativeLayout>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:layout_below="@id/topBar"
+    >
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="35dp"
-            android:orientation="horizontal"
-            android:background="@color/ColorPrimary">
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:src="@drawable/settings"
-                android:layout_marginRight="52dp"
-                android:layout_marginLeft="5dp"
-                android:background="@null"
-                android:onClick="openSettings"/>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:id="@+id/date"
-                android:text="@string/date"
-                android:background="@drawable/blue_button"
-                style="@style/button_text_white"
-                android:layout_marginLeft="10dp"
-                android:onClick="openDate"/>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:id="@+id/hype"
-                android:text="@string/hype"
-                android:background="@drawable/blue_button"
-                style="@style/button_text_white"
-                android:onClick="openHype"/>
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:src="@drawable/plus"
-                android:layout_marginRight="5dp"
-                android:layout_marginLeft="52dp"
-                android:background="@null"
-                android:onClick="openAdd"/>
-
-        </LinearLayout>
-
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/slate_gray"
+            android:textColor="@color/slate_gray_solid"
             android:text="@string/my_account"
-            android:textSize="15dp"
+            android:textSize="18sp"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
             android:paddingLeft="13dp"/>
 
-            <LinearLayout
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.2dp"
+            android:visibility="visible"
+            android:background="@color/slate_gray"/>
+
+
+            <RelativeLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="140dp"
                 android:id="@+id/profile"
-                android:orientation="horizontal">
-            </LinearLayout>
+                android:orientation="horizontal"
+                >
+
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/event_background"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:layout_width="140dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/logo"
+                    android:background="#666666"
+                    android:id="@+id/userProfilePic"
+                    android:layout_marginRight="10dp"
+                    android:scaleType="fitXY" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="30dp"
+                    android:id="@+id/username"
+                    android:text="Reece Jackson"
+                    android:textSize="22sp"
+                    android:textColor="#ffffff"
+                    android:paddingTop="5dp"
+                    android:paddingLeft="5dp"
+                    android:layout_toRightOf="@id/userProfilePic"/>
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:id="@+id/locationIcon"
+                    android:src="@drawable/location"
+                    android:layout_toRightOf="@id/userProfilePic"
+                    android:layout_below="@id/username"
+                    android:layout_marginTop="12dp"/>
+
+                <TextView
+                    android:id="@+id/userLocation"
+                    android:layout_width="fill_parent"
+                    android:layout_height="22dp"
+                    android:text="Santa Clara, CA"
+                    android:textColor="#ffffff"
+                    android:textSize="16sp"
+                    android:paddingLeft="5dp"
+                    android:layout_marginTop="13dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_toRightOf="@id/locationIcon"
+                    android:layout_below="@id/username"/>
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:id="@+id/schoolIcon"
+                    android:src="@drawable/school"
+                    android:layout_toRightOf="@id/userProfilePic"
+                    android:layout_below="@id/locationIcon"
+                    android:layout_marginTop="10dp"/>
+
+                <TextView
+                    android:id="@+id/schoolName"
+                    android:layout_width="fill_parent"
+                    android:layout_height="22dp"
+                    android:text="Santa Clara University"
+                    android:textColor="#ffffff"
+                    android:textSize="16sp"
+                    android:layout_marginTop="11dp"
+                    android:paddingLeft="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_toRightOf="@id/locationIcon"
+                    android:layout_below="@id/userLocation"/>
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:id="@+id/gradIcon"
+                    android:src="@drawable/grad"
+                    android:layout_toRightOf="@id/userProfilePic"
+                    android:layout_below="@id/schoolIcon"
+                    android:layout_marginTop="10dp"/>
+
+                <TextView
+                    android:id="@+id/userClass"
+                    android:layout_width="fill_parent"
+                    android:layout_height="22dp"
+                    android:text="Class of 2018"
+                    android:textColor="#ffffff"
+                    android:textSize="16sp"
+                    android:layout_marginTop="10dp"
+                    android:paddingLeft="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_toRightOf="@id/locationIcon"
+                    android:layout_below="@id/schoolName"/>
+
+            </RelativeLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="0.2dp"
+            android:visibility="visible"
+            android:background="@color/slate_gray"
+            android:layout_marginBottom="10dp"/>
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/slate_gray"
+            android:textColor="@color/slate_gray_solid"
             android:text="@string/notify_me"
-            android:textSize="15dp"
+            android:textSize="18sp"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
             android:paddingLeft="13dp"/>
@@ -92,9 +200,10 @@
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:text="On my accepted/rejected submission"
-                android:textSize="15dp"
+                android:textSize="12sp"
+                android:gravity="center"
                 android:textColor="@color/Black"
                 android:paddingLeft="15dp"
                 android:layout_gravity="center_vertical"/>
@@ -133,7 +242,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Upon any new events"
-                android:textSize="15dp"
+                android:textSize="12sp"
                 android:textColor="@color/Black"
                 android:paddingLeft="15dp"
                 android:layout_gravity="center_vertical"/>
@@ -172,7 +281,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="When an event hits a certain hype"
-            android:textSize="15dp"
+            android:textSize="12sp"
             android:textColor="@color/Black"
             android:paddingLeft="15dp"
             android:layout_gravity="center_vertical"/>
@@ -199,17 +308,16 @@
             android:layout_width="fill_parent"
             android:layout_height="0.2dp"
             android:visibility="visible"
+            android:layout_marginBottom="10dp"
             android:background="@color/slate_gray"/>
-
-
 
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/slate_gray"
+            android:textColor="@color/slate_gray_solid"
             android:text="@string/other_stuff"
-            android:textSize="15dp"
+            android:textSize="18sp"
             android:paddingBottom="12dp"
             android:paddingTop="12dp"
             android:paddingLeft="13dp"/>
@@ -230,7 +338,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Privacy"
-                android:textSize="15dp"
+                android:textSize="16sp"
                 android:textColor="@color/Black"
                 android:paddingLeft="15dp"
                 android:layout_gravity="center_vertical"/>
@@ -272,7 +380,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Terms of Service"
-                android:textSize="15dp"
+                android:textSize="16sp"
                 android:textColor="@color/Black"
                 android:paddingLeft="15dp"
                 android:layout_gravity="center_vertical"/>
@@ -314,7 +422,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Contact Us"
-                android:textSize="15dp"
+                android:textSize="16sp"
                 android:textColor="@color/Black"
                 android:paddingLeft="15dp"
                 android:layout_gravity="center_vertical"/>
@@ -374,10 +482,12 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="Made with ♥ by AloaLabs (version 0.1)"
+            android:layout_marginBottom="15dp"
             android:textColor="@color/slate_gray"
-            android:paddingLeft="10dp"
-            android:paddingTop="5dp"/>
+            android:paddingLeft="18sp"
+            android:paddingTop="10dp"/>
 
     </LinearLayout>
 
 </ScrollView>
+    </RelativeLayout>
