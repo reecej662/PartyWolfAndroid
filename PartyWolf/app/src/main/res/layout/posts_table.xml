@@ -5,12 +5,18 @@
     android:background="#ffffff"
     >
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/main_list_view"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/pullToRefresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/topBar">
-    </ListView>
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/main_list_view"
+            android:layout_below="@id/topBar">
+        </ListView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <View
         android:layout_width="match_parent"
@@ -20,25 +26,24 @@
         />
 
     <ImageButton
-        android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:scaleType="fitXY"
+        android:padding="12dp"
         android:id="@+id/newPostButton"
-        android:layout_marginTop="2dp"
-        android:background="@drawable/plus"
-        android:textSize="30dp"
+        android:src="@drawable/plus"
         android:textColor="#ffffff"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_margin="14dp"
         style="?android:attr/borderlessButtonStyle"
         />
 
     <ImageButton
-        android:layout_width="33dp"
-        android:layout_height="25dp"
-        android:layout_margin="13dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="12dp"
+        android:layout_margin="0dp"
         android:scaleType="fitXY"
         android:id="@+id/settingsButton"
         android:src="@drawable/settings"

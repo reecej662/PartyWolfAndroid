@@ -5,8 +5,10 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -63,7 +65,14 @@ public class EventDetailA extends Activity {
         TextView emoji = (TextView) findViewById(R.id.event_detail_emoji);
         TextView date = (TextView) findViewById(R.id.event_detail_date);
         friendView = (LinearLayout) findViewById(R.id.event_detail_friend_container);
+        Button button = (Button) findViewById(R.id.event_detail_back);
 
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         /*
 

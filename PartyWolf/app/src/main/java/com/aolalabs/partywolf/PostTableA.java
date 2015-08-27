@@ -10,6 +10,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -94,11 +97,33 @@ public class PostTableA extends Activity implements OnClickListener{
         hypeButton = (Button) findViewById(R.id.hypeOption);
         dateButton = (Button) findViewById(R.id.dateOption);
         settingsButton = (ImageButton) findViewById(R.id.settingsButton);
+        final SwipeRefreshLayout pullToRefresh = (SwipeRefreshLayout) findViewById(R.id.pullToRefresh);
+
+
+        pullToRefresh.setColorSchemeResources(R.color.ColorPrimary);
 
         newPostButton.setOnClickListener(this);
         hypeButton.setOnClickListener(this);
         dateButton.setOnClickListener(this);
         settingsButton.setOnClickListener(this);
+
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                pullToRefresh.setRefreshing(true);
+                System.out.println("Refreshed");
+                Log.d("Swipe", "Refreshing Number");
+                (new Handler()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        pullToRefresh.setRefreshing(false);
+                        upvoteEvents.removeAll(upvoteEvents);
+                        loadUpvoteData();
+                        System.out.println("Now we're done refreshing");
+                    }
+                }, 3000);
+            }
+        });
 
         // Go to login screen if no user not currently logged in
         Intent login = new Intent(this, LoginA.class);
@@ -112,6 +137,8 @@ public class PostTableA extends Activity implements OnClickListener{
             }
         } catch (Exception e) {
             startActivity(login);
+        } finally {
+            loadUpvoteData();
         }
 
         // Load the posts the user has updated
@@ -122,7 +149,7 @@ public class PostTableA extends Activity implements OnClickListener{
     @Override
     protected void onResume() {
         super.onResume();
-        loadUpvoteData();
+        //loadUpvoteData();
         System.out.println("Resuming activity");
     }
 
@@ -207,13 +234,13 @@ public class PostTableA extends Activity implements OnClickListener{
                 try {
                     if (e == null) {
                         for (ParseObject object : postList) {
-                            if((eventInArea(object) && !object.getBoolean("onCampus"))
-                                    || (currentUser.get("university").equals(object.get("university")))) {
+//                            if((eventInArea(object) && !object.getBoolean("onCampus"))
+//                                    || (currentUser.get("university").equals(object.get("university")))) {
                                 events.add(new Event(object));
                                 parseEvents.add(object);
-                            } else {
-                                System.out.println("Event not in local area");
-                            }
+//                            } else {
+//                                System.out.println("Event not in local area");
+//                            }
                         }
                     } else {
                         e.printStackTrace();
@@ -431,6 +458,8 @@ public class PostTableA extends Activity implements OnClickListener{
                 if ((upvotedEvent = userUpvoted(event)) != null) {
                     event.unvote();
                     upvoteEvents.remove(upvotedEvent);
+                    System.out.println("User unvoted the event");
+                    System.out.println("upvoteEvents count: " + upvoteEvents.size());
                 }
             }
 
@@ -521,7 +550,7 @@ public class PostTableA extends Activity implements OnClickListener{
             @Override
             public void onLocationChanged(Location location) {
                 userLocation = location;
-                loadUpvoteData();
+                //loadUpvoteData();
             }
 
             @Override

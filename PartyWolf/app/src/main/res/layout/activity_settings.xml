@@ -19,6 +19,7 @@
         android:layout_marginStart="5dp"
         android:scaleType="fitXY"
         android:id="@+id/doneButton"
+        android:textSize="18sp"
         android:text="Done"
         android:textColor="#ffffff"
         android:layout_marginTop="5dp"
