@@ -105,8 +105,7 @@ public class Event implements Serializable, Comparable<Event> {
         }
         this.date = object.getDate("date");
         System.out.println(this.date);
-        SimpleDateFormat sdf1 = new SimpleDateFormat("LLLL, d" +
-                "");
+        SimpleDateFormat sdf1 = new SimpleDateFormat("LLLL d"   );
         this.dateOfEvent = sdf1.format(this.date);
         System.out.println(this.dateOfEvent);
 

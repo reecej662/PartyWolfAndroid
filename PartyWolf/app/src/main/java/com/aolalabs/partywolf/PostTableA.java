@@ -276,6 +276,7 @@ public class PostTableA extends Activity implements OnClickListener{
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
+                System.out.println(viewClicked.getId());
                 Event clickedEvent;
                 if (dateView) {
                     clickedEvent = events.get(position);
@@ -295,11 +296,6 @@ public class PostTableA extends Activity implements OnClickListener{
         public MyListAdapter(ArrayList<Event> listEvents) {
             super(PostTableA.this, R.layout.swipe_event, listEvents);
             events = listEvents;
-        }
-
-        @Override
-        public boolean isEnabled(int position) {
-            return super.isEnabled(position);
         }
 
         @Override
@@ -373,8 +369,26 @@ public class PostTableA extends Activity implements OnClickListener{
 
             // Handle swipe layout
 
+            final int elementPosition = position;
+            final OnClickListener clickListener = new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    System.out.println(v.getId());
+                    Event clickedEvent;
+                    if (dateView) {
+                        clickedEvent = events.get(elementPosition);
+                    } else {
+                        clickedEvent = sortedEvents.get(elementPosition);
+                    }
+                    Intent i = new Intent(PostTableA.this, EventDetailA.class);
+                    i.putExtra("event", clickedEvent);
+                    startActivity(i);
+                }
+            };
+
             //set show mode.
             swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
+            swipeLayout.setOnClickListener(clickListener);
 
             //add drag edge.(If the BottomView has 'layout_gravity' attribute, this line is unnecessary)
 //            swipeLayout.addDrag(SwipeLayout.DragEdge.Right, findViewById(R.id.bottom_wrapper));
@@ -383,11 +397,13 @@ public class PostTableA extends Activity implements OnClickListener{
                 @Override
                 public void onClose(SwipeLayout layout) {
                     //when the SurfaceView totally cover the BottomView.
+                    layout.setOnClickListener(clickListener);
                 }
 
                 @Override
                 public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
                     //you are swiping.
+                    layout.setOnClickListener(null);
                 }
 
                 @Override

@@ -3,6 +3,7 @@ package com.aolalabs.partywolf;
 import android.app.Application;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -10,6 +11,7 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ParsePush;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import io.fabric.sdk.android.Fabric;
 
 
 /**
@@ -19,6 +21,7 @@ public class InitializeApp extends Application {
 
     public void onCreate(){
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
 
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "8IiZUWr2nVlthlX1VVrq3gDHXMfuhefW3EIbBdzE", "TNc5sg3go9lqQBcdizIZvgwa3wmXrDPo0D7txBTT");

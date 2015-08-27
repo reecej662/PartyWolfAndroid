@@ -130,6 +130,9 @@
                 <action android:name="com.parse.push.intent.OPEN" />
             </intent-filter>
         </receiver>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="e01e05dc4c9bfac8d158d5f26fd9c7be5f4ade07" />
     </application>
 
 </manifest>
