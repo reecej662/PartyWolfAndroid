@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/swipeLayout"
+    >
+
+
+    <!-- Bottom View Start-->
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:background="#ff0000"
+        android:id="@+id/bottom_wrapper"
+        android:layout_width="100dp"
+        android:weightSum="1"
+        android:layout_height="match_parent"
+        android:gravity="center">
+        <!--What you want to show-->
+        <Button
+            android:id="@+id/report_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:text="Report"
+            style="?android:attr/borderlessButtonStyle"/>
+    </LinearLayout>
+
+    <!-- Bottom View End-->
+
+
+    <!-- Top View Start -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ffffff"
+        android:paddingBottom="10dp"
+        >
+
+        <LinearLayout
+            android:id="@+id/event_section"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:background="#f0f0f0"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/event_weekday"
+                android:layout_height="match_parent"
+                android:layout_width="200dp"
+                android:text="Weekday"
+                android:textSize="14sp"
+                android:textColor="#000000"
+                android:layout_centerVertical="true"
+                android:gravity="fill_vertical"
+                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_alignParentLeft="true"
+                android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/event_date"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:gravity="right"
+                android:text="Date"
+                android:textSize="14sp"
+                android:textColor="#000000"
+                android:padding="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_alignParentRight="true"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/event_hype_button"
+            android:background="@drawable/vote"
+            android:layout_below="@id/event_section"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:scaleType="fitXY"
+            android:layout_marginTop="6dp"
+            android:onClick="upvoteHandler"
+            android:focusable="false"
+            android:textSize="0sp"
+            android:text="vote" />
+
+        <TextView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/event_hype_button"
+            android:id="@+id/event_hype_number"
+            android:text="0"
+            android:textColor="#000000"
+            android:padding="5dp"
+            android:gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="-30dp"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/event_title"
+            android:layout_width="wrap_content"
+            android:layout_below="@id/event_section"
+            android:text="Title"
+            android:textSize="22dp"
+            android:textColor="#000000"
+            android:paddingLeft="70dp"
+            android:paddingTop="0dp"
+            android:layout_marginTop="5dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/event_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description"
+            android:textSize="12dp"
+            android:textColor="#000000"
+            android:paddingLeft="70dp"
+            android:paddingTop="5dp"
+            android:layout_below="@id/event_title"/>
+
+        <TextView
+            android:id="@+id/event_time_and_place"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12:00PM ~ by Me (Price)"
+            android:textSize="12sp"
+            android:textColor="#000000"
+            android:paddingTop="5dp"
+            android:paddingLeft="70dp"
+            android:layout_below="@id/event_description"/>
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/event_emoji"
+            android:layout_below="@id/event_section"
+            android:text="emoji"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:layout_marginLeft="320dp"
+            android:layout_marginStart="320dp"
+            android:layout_marginTop="30dp" />
+    </RelativeLayout>
+
+    <!-- Top View End-->
+
+</com.daimajia.swipe.SwipeLayout>

@@ -22,11 +22,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.daimajia.swipe.SwipeLayout;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
@@ -100,7 +102,7 @@ public class PostTableA extends Activity implements OnClickListener{
         final SwipeRefreshLayout pullToRefresh = (SwipeRefreshLayout) findViewById(R.id.pullToRefresh);
 
 
-        pullToRefresh.setColorSchemeResources(R.color.ColorPrimary);
+        pullToRefresh.setColorSchemeResources(R.color.ColorPrimary );
 
         newPostButton.setOnClickListener(this);
         hypeButton.setOnClickListener(this);
@@ -117,7 +119,11 @@ public class PostTableA extends Activity implements OnClickListener{
                     @Override
                     public void run() {
                         pullToRefresh.setRefreshing(false);
+                        events.removeAll(events);
                         upvoteEvents.removeAll(upvoteEvents);
+                        upvoteObjects.removeAll(upvoteObjects);
+                        populateEventList();
+                        //populateListView((ArrayList<Event>) events);
                         loadUpvoteData();
                         System.out.println("Now we're done refreshing");
                     }
@@ -287,12 +293,17 @@ public class PostTableA extends Activity implements OnClickListener{
         private ArrayList<Event> events;
 
         public MyListAdapter(ArrayList<Event> listEvents) {
-            super(PostTableA.this, R.layout.event, listEvents);
+            super(PostTableA.this, R.layout.swipe_event, listEvents);
             events = listEvents;
         }
 
         @Override
-        public View getView(final int position, View convertView, ViewGroup parent) {
+        public boolean isEnabled(int position) {
+            return super.isEnabled(position);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
             // Make sure we have a view to work with (may have been given null)
             if (dateView) {
                 events = (ArrayList<Event>) PostTableA.this.events;
@@ -302,13 +313,13 @@ public class PostTableA extends Activity implements OnClickListener{
 
             View itemView = convertView;
             if (itemView == null) {
-                itemView = getLayoutInflater().inflate(R.layout.event, parent, false);
+                itemView = getLayoutInflater().inflate(R.layout.swipe_event, parent, false);
             }
 
             Event currentEvent = events.get(position);
 
             // fill the view
-            RelativeLayout daySection = (RelativeLayout) itemView.findViewById(R.id.event_section);
+            LinearLayout daySection = (LinearLayout) itemView.findViewById(R.id.event_section);
             TextView weekday = (TextView) itemView.findViewById(R.id.event_weekday);
             TextView date = (TextView) itemView.findViewById(R.id.event_date);
             TextView title = (TextView) itemView.findViewById(R.id.event_title);
@@ -317,6 +328,9 @@ public class PostTableA extends Activity implements OnClickListener{
             TextView emoji = (TextView) itemView.findViewById(R.id.event_emoji);
             final TextView upvotes = (TextView) itemView.findViewById(R.id.event_hype_number);
             final Button button = (Button) itemView.findViewById(R.id.event_hype_button);
+            SwipeLayout swipeLayout =  (SwipeLayout) itemView.findViewById(R.id.swipeLayout);
+            final Button reportButton = (Button) itemView.findViewById(R.id.report_button);
+
 
             button.setTag(parseObjectForEvent(currentEvent));
 
@@ -356,6 +370,54 @@ public class PostTableA extends Activity implements OnClickListener{
                 button.setBackgroundResource(R.drawable.vote);
                 button.setText("vote");
             }
+
+            // Handle swipe layout
+
+            //set show mode.
+            swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
+
+            //add drag edge.(If the BottomView has 'layout_gravity' attribute, this line is unnecessary)
+//            swipeLayout.addDrag(SwipeLayout.DragEdge.Right, findViewById(R.id.bottom_wrapper));
+
+            swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener() {
+                @Override
+                public void onClose(SwipeLayout layout) {
+                    //when the SurfaceView totally cover the BottomView.
+                }
+
+                @Override
+                public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
+                    //you are swiping.
+                }
+
+                @Override
+                public void onStartOpen(SwipeLayout layout) {
+
+                }
+
+                @Override
+                public void onOpen(SwipeLayout layout) {
+                    //when the BottomView totally show.
+                }
+
+                @Override
+                public void onStartClose(SwipeLayout layout) {
+
+                }
+
+                @Override
+                public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
+                    //when user's hand released.
+                }
+            });
+
+            reportButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast reportToast = Toast.makeText(PostTableA.this, "Event reported. Thanks!", Toast.LENGTH_LONG);
+                    reportToast.show();
+                }
+            });
 
             loadingDialog.dismiss();
 
