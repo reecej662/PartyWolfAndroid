@@ -36,7 +36,6 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
-import com.parse.RefreshCallback;
 import com.parse.SaveCallback;
 import com.victor.loading.rotate.RotateLoading;
 
@@ -81,10 +80,6 @@ public class PostTableA extends Activity implements OnClickListener{
 
     @Override
     protected void onCreate(Bundle savedInstance) {
-        // Enable Local Datastore.
-        // Parse.enableLocalDatastore(this);
-
-        // Parse.initialize(this, "8IiZUWr2nVlthlX1VVrq3gDHXMfuhefW3EIbBdzE", "TNc5sg3go9lqQBcdizIZvgwa3wmXrDPo0D7txBTT");
 
         super.onCreate(savedInstance);
         setContentView(R.layout.posts_table);
@@ -105,7 +100,7 @@ public class PostTableA extends Activity implements OnClickListener{
         final SwipeRefreshLayout pullToRefresh = (SwipeRefreshLayout) findViewById(R.id.pullToRefresh);
 
 
-        pullToRefresh.setColorSchemeResources(R.color.ColorPrimary );
+        pullToRefresh.setColorSchemeResources(R.color.ColorPrimary);
 
         newPostButton.setOnClickListener(this);
         hypeButton.setOnClickListener(this);
@@ -143,22 +138,14 @@ public class PostTableA extends Activity implements OnClickListener{
             if(currentUser == null) {
                 startActivity(login);
             } else {
-                currentUser.refreshInBackground(new RefreshCallback() {
-                    @Override
-                    public void done(ParseObject parseObject, ParseException e) {
-                        System.out.println("User refreshed");
-                        loadUpvoteData();
-                    }
-                });
+                currentUser.fetchInBackground();
 
                 getLocation();
             }
         } catch (Exception e) {
             startActivity(login);
-        } finally {
-
         }
-
+        
         // Load the posts the user has updated
 //        System.out.println("Confirmed: " + currentUser.getBoolean("confirmed"));
 
@@ -324,7 +311,7 @@ public class PostTableA extends Activity implements OnClickListener{
                 itemView = getLayoutInflater().inflate(R.layout.swipe_event, parent, false);
             }
 
-            Event currentEvent = events.get(position);
+            final Event currentEvent = events.get(position);
 
             // fill the view
             LinearLayout daySection = (LinearLayout) itemView.findViewById(R.id.event_section);
@@ -444,6 +431,8 @@ public class PostTableA extends Activity implements OnClickListener{
                 public void onClick(View v) {
                     Toast reportToast = Toast.makeText(PostTableA.this, "Event reported. Thanks!", Toast.LENGTH_LONG);
                     reportToast.show();
+                    Report newReport = new Report("Problem with event", parseObjectForEvent(currentEvent), PostTableA.this);
+                    newReport.submit();
                 }
             });
 
