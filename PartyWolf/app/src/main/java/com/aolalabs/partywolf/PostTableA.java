@@ -36,6 +36,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.RefreshCallback;
 import com.parse.SaveCallback;
 import com.victor.loading.rotate.RotateLoading;
 
@@ -51,6 +52,8 @@ import java.util.List;
 // Array of options --> ArrayAdapter --> ListView
 
 //List view: {views: da_items.xml}
+
+// Fix bug that makes the buttons blue more consistently
 
 /**
  * Created by reecejackson on 8/18/15.
@@ -125,6 +128,7 @@ public class PostTableA extends Activity implements OnClickListener{
                         populateEventList();
                         //populateListView((ArrayList<Event>) events);
                         loadUpvoteData();
+                        populateEventList();
                         System.out.println("Now we're done refreshing");
                     }
                 }, 3000);
@@ -139,12 +143,20 @@ public class PostTableA extends Activity implements OnClickListener{
             if(currentUser == null) {
                 startActivity(login);
             } else {
+                currentUser.refreshInBackground(new RefreshCallback() {
+                    @Override
+                    public void done(ParseObject parseObject, ParseException e) {
+                        System.out.println("User refreshed");
+                        loadUpvoteData();
+                    }
+                });
+
                 getLocation();
             }
         } catch (Exception e) {
             startActivity(login);
         } finally {
-            loadUpvoteData();
+
         }
 
         // Load the posts the user has updated
@@ -242,8 +254,8 @@ public class PostTableA extends Activity implements OnClickListener{
                         for (ParseObject object : postList) {
 //                            if((eventInArea(object) && !object.getBoolean("onCampus"))
 //                                    || (currentUser.get("university").equals(object.get("university")))) {
-                                events.add(new Event(object));
-                                parseEvents.add(object);
+                            events.add(new Event(object));
+                            parseEvents.add(object);
 //                            } else {
 //                                System.out.println("Event not in local area");
 //                            }
@@ -527,79 +539,103 @@ public class PostTableA extends Activity implements OnClickListener{
 
     public void unvoteEvent(ParseObject object) {
 
-        try {
-            object.increment("upvotes", -1);
-
-            Event upvotedEvent = null;
-
-            for (Event event : events) {
-                if ((upvotedEvent = userUpvoted(event)) != null) {
-                    event.unvote();
-                    upvoteEvents.remove(upvotedEvent);
-                    System.out.println("User unvoted the event");
-                    System.out.println("upvoteEvents count: " + upvoteEvents.size());
-                }
+        // Change the values for the locally stored Event
+        Event upvotedEvent = null;
+        for (Event event : events) {
+            if ((upvotedEvent = userUpvoted(event)) != null) {
+                event.unvote();
+                upvoteEvents.remove(upvotedEvent);
+                System.out.println("User unvoted the event");
+                System.out.println("upvoteEvents count: " + upvoteEvents.size());
             }
+        }
 
-            upvoteObjects.remove(object);
+        upvoteObjects.remove(object);
+
+        // Add the new user to the object upvote relation and increment number
+        try {
+            // Change the values for the parse object
+            object.increment("upvotes", -1);
+            object.getRelation("upvote_data").remove(currentUser);
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
 
-            currentUser.put("upvote_data", upvoteObjects);
-            currentUser.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    System.out.println("User updated");
-                }
-            });
-
             object.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
+                    if (e != null)
+                        Log.d("Object saving error", e.toString());
                     System.out.println("Post updated");
                 }
             });
         }
+
+        // Add the new post to the user's list of upvoted posts
+        try {
+            ParseUser.getCurrentUser().getRelation("upvote_data").remove(object);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+
+            currentUser.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e != null)
+                        Log.d("User saving error", e.toString());
+                    System.out.println("User updated");
+                }
+            });
+        }
+
     }
 
-    public void upvoteEvent(ParseObject object) {
+    public void upvoteEvent(final ParseObject object) {
 
+        // Get the coresponding event in the local array and add to the upvoted list
+        for (Event event : events) {
+            if (event.getObjectID().equals(object.getObjectId())) {
+                upvoteEvents.add(event);
+                event.upvote();
+            }
+        }
+
+        upvoteObjects.add(object);
+
+        // Add the current user to the object's upvote relation and increment the count
         try {
             object.increment("upvotes", 1);
-
-            // Get the coresponding event in the local array and add to the upvoted list
-            for (Event event : events) {
-                if (event.getObjectID().equals(object.getObjectId())) {
-                    upvoteEvents.add(event);
-                    event.upvote();
-                }
-            }
-
-            upvoteObjects.add(object);
-
+            object.getRelation("upvote_data").add(ParseUser.getCurrentUser());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-
-            currentUser.put("upvote_data", upvoteObjects);
-            currentUser.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    System.out.println("User updated");
-                }
-            });
-
             object.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
+                    if (e != null)
+                        Log.d("Object saving error", e.toString());
+                    System.out.println("New upvote count: " + object.getNumber("upvotes"));
                     System.out.println("Post updated");
                 }
             });
         }
 
-
+        // Remove the object from the current user's upvoted objects
+        try {
+            currentUser.getRelation("upvote_data").add(object);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            currentUser.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e != null)
+                        Log.d("User saving error", e.toString());
+                    System.out.println("User updated");
+                }
+            });
+        }
     }
 
     public Dialog showLoadingDialog() {

@@ -48,7 +48,7 @@ public class Add extends Activity {
         Button aButton = (Button) findViewById(R.id.new_date);
         aButton.setVisibility(View.GONE);
         Button bButton = (Button) findViewById(R.id.new_time);
-        bButton.setVisibility(View.VISIBLE);
+        //bButton.setVisibility(View.VISIBLE);
         DatePicker datePicker = (DatePicker) findViewById(R.id.eventDate);
         datePicker.setVisibility(View.VISIBLE);
         eventTitle.setVisibility(View.GONE);
@@ -57,6 +57,10 @@ public class Add extends Activity {
         host.setVisibility(View.GONE);
         fee.setVisibility(View.GONE);
         horizontal_layout.setVisibility(View.GONE);
+        TimePicker timePicker = (TimePicker) findViewById(R.id.eventTime);
+        timePicker.setVisibility(View.VISIBLE);
+        Button cButton = (Button) findViewById(R.id.post);
+        cButton.setVisibility(View.VISIBLE);
     }
 
     public void setTime (View view){
@@ -268,6 +272,9 @@ public class Add extends Activity {
         StringBuilder thanksForNewEventMessage = new StringBuilder(getResources().getString(R.string.thanks_for_new_event));
         Toast.makeText(Add.this, thanksForNewEventMessage.toString(), Toast.LENGTH_LONG).show();
         finish();
+
+//        Event newEvent = new Event(event);
+//        System.out.println("New event: " + newEvent);
     }
 
     public void openPrevious(View view){

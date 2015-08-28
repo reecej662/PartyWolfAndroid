@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/GrayBackground"
-    >
+    android:background="@color/GrayBackground" >
 
     <RelativeLayout
         android:id="@+id/topBar"
@@ -50,143 +49,144 @@
 
     </RelativeLayout>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:background="#ffffff"
-    android:layout_below="@id/topBar">
-
-    <EditText
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:hint="@string/event_name_title"
-        android:id="@+id/event_name_title"
-        android:textColorHint="#d3d3d3"
-        android:textColor="@color/Black"
-        android:singleLine="true"
-        android:nextFocusDown="@+id/event_description"/>
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="320dp"
-        android:hint="@string/event_description"
-        android:id="@+id/event_description"
-        android:textColorHint="#d3d3d3"
-        android:textColor="@color/Black"
-        android:gravity="top"
-        android:singleLine="true"
-        android:nextFocusDown="@+id/horizontal_layout"/>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:layout_gravity="center_vertical"
-        android:id="@+id/horizontal_layout"
-        android:nextFocusRight="@+id/fee">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:background="#ffffff"
+        android:layout_below="@id/topBar">
 
         <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/fee"
-            android:text="@string/fee"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:hint="@string/event_name_title"
+            android:id="@+id/event_name_title"
             android:textColorHint="#d3d3d3"
             android:textColor="@color/Black"
             android:singleLine="true"
-            android:nextFocusDown="@+id/one_emoji" />
+            android:nextFocusDown="@+id/event_description"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="320dp"
+            android:hint="@string/event_description"
+            android:id="@+id/event_description"
+            android:textColorHint="#d3d3d3"
+            android:textColor="@color/Black"
+            android:gravity="top"
+            android:singleLine="true"
+            android:nextFocusDown="@+id/horizontal_layout"/>
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="right"
+            android:layout_height="50dp"
             android:orientation="horizontal"
-            android:layout_gravity="center_vertical">
+            android:layout_gravity="center_vertical"
+            android:id="@+id/horizontal_layout"
+            android:nextFocusRight="@+id/fee">
 
-            <TextView
+            <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/on_campus"
+                android:id="@+id/fee"
+                android:text="@string/fee"
+                android:textColorHint="#d3d3d3"
                 android:textColor="@color/Black"
                 android:singleLine="true"
-                android:gravity="right"
-                android:paddingRight="5dp"/>
+                android:nextFocusDown="@+id/one_emoji" />
 
-            <Switch
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/on_campus"
-                android:paddingRight="10dp"/>
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:layout_gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/on_campus"
+                    android:textColor="@color/Black"
+                    android:singleLine="true"
+                    android:gravity="right"
+                    android:paddingRight="5dp"/>
+
+                <Switch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/on_campus"
+                    android:paddingRight="10dp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+
+            android:weightSum="7"        android:orientation="horizontal">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/one_emoji"
+                android:id="@+id/one_emoji"
+                android:textColorHint="#d3d3d3"
+                android:textColor="@color/Black"
+                android:layout_weight="5"
+                android:singleLine="true"
+                android:nextFocusDown="@+id/presented_by"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/presented_by"
+                android:id="@+id/presented_by"
+                android:textColorHint="#d3d3d3"
+                android:textColor="@color/Black"
+                android:layout_weight="2"
+                android:singleLine="true"
+                android:nextFocusDown="@+id/new_date"/>
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="@string/new_date"
+            android:textSize="15sp"
+            android:id="@+id/new_date"
+            android:background="#73e773"
+            style="@style/add_button_text_white"
+            android:onClick="setDate"/>
+
+        <DatePicker
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/eventDate"
+            android:visibility="gone"
+            android:headerBackground="@color/ColorPrimary" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/new_time"
+            android:id="@+id/new_time"
+            android:background="#73e773"
+            style="@style/add_button_text_white"
+            android:onClick="setTime"
+            android:visibility="gone"/>
+
+        <TimePicker
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/eventTime"
+            android:visibility="gone"
+            android:headerBackground="@color/ColorPrimary"/>
+
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal">
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/one_emoji"
-            android:id="@+id/one_emoji"
-            android:textColorHint="#d3d3d3"
-            android:textColor="@color/Black"
-            android:layout_weight="5"
-            android:singleLine="true"
-            android:nextFocusDown="@+id/presented_by"/>
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/presented_by"
-            android:id="@+id/presented_by"
-            android:textColorHint="#d3d3d3"
-            android:textColor="@color/Black"
-            android:layout_weight="2"
-            android:singleLine="true"
-            android:nextFocusDown="@+id/new_date"/>
-
-    </LinearLayout>
-
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:text="@string/new_date"
-        android:textSize="15sp"
-        android:id="@+id/new_date"
-        android:background="#73e773"
-        style="@style/add_button_text_white"
-        android:onClick="setDate"/>
-
-    <DatePicker
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/eventDate"
-        android:visibility="gone"
-        android:headerBackground="@color/ColorPrimary" />
-
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/new_time"
-        android:id="@+id/new_time"
-        android:background="#73e773"
-        style="@style/add_button_text_white"
-        android:onClick="setTime"
-        android:visibility="gone"/>
-
-    <TimePicker
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/eventTime"
-        android:visibility="gone"
-        android:headerBackground="@color/ColorPrimary"/>
-
-</LinearLayout>
-
-    </RelativeLayout>
+</RelativeLayout>

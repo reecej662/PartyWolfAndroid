@@ -8,9 +8,11 @@ import com.facebook.FacebookSdk;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
 import io.fabric.sdk.android.Fabric;
 
 
@@ -21,7 +23,9 @@ public class InitializeApp extends Application {
 
     public void onCreate(){
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
+        Crashlytics crashlytics = new Crashlytics.Builder().disabled(BuildConfig.DEBUG).build();
+        Fabric.with(this, crashlytics);
+       // Fabric.with(this, new Crashlytics());
 
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "8IiZUWr2nVlthlX1VVrq3gDHXMfuhefW3EIbBdzE", "TNc5sg3go9lqQBcdizIZvgwa3wmXrDPo0D7txBTT");
@@ -30,6 +34,10 @@ public class InitializeApp extends Application {
 
         ParseFacebookUtils.initialize(this);
         ParseUser.enableRevocableSessionInBackground();
+
+        ParseObject testObject = new ParseObject("TestObject");
+        testObject.put("foo", "bar");
+        testObject.saveInBackground();
 
         ParsePush.subscribeInBackground("", new SaveCallback() {
             @Override

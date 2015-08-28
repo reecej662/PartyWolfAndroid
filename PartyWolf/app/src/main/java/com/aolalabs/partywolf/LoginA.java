@@ -205,7 +205,7 @@ public class LoginA extends Activity implements OnClickListener {
                             String location = user.getString("location");
                             currentUser.put("hometown", location);
 
-                            currentUser.put("banned", false);
+                            currentUser.put("banned", "false");
                             currentUser.put("confirmed", false);
                             currentUser.put("score", 0);
                             currentUser.put("leader", false);
