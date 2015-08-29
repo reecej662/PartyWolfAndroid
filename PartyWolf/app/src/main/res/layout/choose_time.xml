@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/topBar"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:background="@color/ColorPrimary">
+
+        <Button
+            android:layout_width="70dp"
+            android:layout_height="fill_parent"
+            android:text="@string/cancel"
+            android:id="@+id/cancel"
+            android:textSize="20sp"
+            android:background="@android:color/transparent"
+            style="@style/add_button_text_white"
+            android:onClick="openPrevious" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:id="@+id/new_post"
+            android:text="@string/new_post"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:paddingTop="11dp"
+            android:background="@drawable/blue_blue_button"
+            style="@style/new_post"
+            android:textSize="24sp"
+            android:paddingBottom="10dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:text="@string/submit"
+            android:textSize="18sp"
+            android:id="@+id/post"
+            android:background="@android:color/transparent"
+            style="@style/add_button_text_white"
+            android:onClick="newPost"
+            android:visibility="invisible"/>
+
+    </RelativeLayout>
+
+    <DatePicker
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/datePicker"
+        android:layout_below="@id/topBar"
+        style="DatePickerDialog.THEME_HOLO_DARK">
+
+    </DatePicker>
+
+    <TimePicker
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/datePicker"/>
+
+</RelativeLayout>

@@ -126,8 +126,7 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="50dp"
-
-            android:weightSum="7"        android:orientation="horizontal">
+            android:orientation="horizontal">
 
             <EditText
                 android:layout_width="match_parent"
@@ -163,13 +162,6 @@
             style="@style/add_button_text_white"
             android:onClick="setDate"/>
 
-        <DatePicker
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/eventDate"
-            android:visibility="gone"
-            android:headerBackground="@color/ColorPrimary" />
-
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -180,13 +172,23 @@
             android:onClick="setTime"
             android:visibility="gone"/>
 
-        <TimePicker
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/eventTime"
-            android:visibility="gone"
-            android:headerBackground="@color/ColorPrimary"/>
-
     </LinearLayout>
+
+    <DatePicker
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/eventDate"
+        android:visibility="gone"
+        android:headerBackground="@color/ColorPrimary"
+        android:layout_below="@id/topBar"
+        />
+
+    <TimePicker
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/eventTime"
+        android:visibility="gone"
+        android:headerBackground="@color/ColorPrimary"
+        android:layout_below="@id/eventDate"/>
 
 </RelativeLayout>

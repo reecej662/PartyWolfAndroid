@@ -1,5 +1,6 @@
 package com.aolalabs.partywolf;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -10,8 +11,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -36,6 +36,13 @@ import com.victor.loading.rotate.RotateLoading;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
+import in.srain.cube.views.ptr.PtrClassicDefaultHeader;
+import in.srain.cube.views.ptr.PtrDefaultHandler;
+import in.srain.cube.views.ptr.PtrFrameLayout;
+import in.srain.cube.views.ptr.PtrUIHandler;
+import in.srain.cube.views.ptr.header.StoreHouseHeader;
+import in.srain.cube.views.ptr.indicator.PtrIndicator;
 
 //import com.walnutlabs.android.ProgressHUD;
 
@@ -66,6 +73,7 @@ public class PostTableA extends Activity implements OnClickListener{
     private Dialog loadingDialog = null;
     private LocationManager locationManager;
     private Location userLocation = null;
+    private boolean firstLoad = true;
 
     @Override
     protected void onCreate(Bundle savedInstance) {
@@ -76,17 +84,19 @@ public class PostTableA extends Activity implements OnClickListener{
         loadingDialog = showLoadingDialog();
         loadingDialog.show();
 
-        final SwipeRefreshLayout pullToRefresh = (SwipeRefreshLayout) findViewById(R.id.pullToRefresh);
+        //final SwipeRefreshLayout pullToRefresh = (SwipeRefreshLayout) findViewById(R.id.pullToRefresh);
 
         dataManager = new PostDataManager(this);
         dataManager.setDataListener(new PostDataManager.DataListener() {
             @Override
             public void onDataLoaded() {
                 Log.d("dataManager", "Data loaded");
-                populateListView(dataManager.events);
+                if(firstLoad)
+                    populateListView(dataManager.events);
+                firstLoad = false;
                 registerClickCallback();
                 loadingDialog.dismiss();
-                pullToRefresh.setRefreshing(false);
+                //pullToRefresh.setRefreshing(false);
             }
         });
 
@@ -105,43 +115,31 @@ public class PostTableA extends Activity implements OnClickListener{
 
 
 
-        pullToRefresh.setColorSchemeResources(R.color.ColorPrimary);
+        //pullToRefresh.setColorSchemeResources(R.color.ColorPrimary);
+
+        setUpPullToRefresh();
 
         newPostButton.setOnClickListener(this);
         hypeButton.setOnClickListener(this);
         dateButton.setOnClickListener(this);
         settingsButton.setOnClickListener(this);
 
-        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                pullToRefresh.setRefreshing(true);
-                System.out.println("Refreshed");
-                Log.d("Swipe", "Refreshing Number");
-                (new Handler()).postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        dataManager.refresh();
-                        System.out.println("Now we're done refreshing");
-                    }
-                }, 2000);
-            }
-        });
+//        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                pullToRefresh.setRefreshing(true);
+//                System.out.println("Refreshed");
+//                Log.d("Swipe", "Refreshing Number");
+//                (new Handler()).postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        dataManager.refresh();
+//                        System.out.println("Now we're done refreshing");
+//                    }
+//                }, 2000);
+//            }
+//        });
 
-        // Go to login screen if no user not currently logged in
-        Intent login = new Intent(this, LoginA.class);
-
-        try{
-            currentUser = ParseUser.getCurrentUser();
-            if(currentUser == null) {
-                startActivity(login);
-            } else {
-                currentUser.fetchInBackground();
-                getLocation();
-            }
-        } catch (Exception e) {
-            startActivity(login);
-        }
 
         // Load the posts the user has updated
 //        System.out.println("Confirmed: " + currentUser.getBoolean("confirmed"));
@@ -484,5 +482,153 @@ public class PostTableA extends Activity implements OnClickListener{
 
     }
 
+
+    public void setUpPullToRefresh() {
+        PtrFrameLayout pullToRefresh = (PtrFrameLayout) findViewById(R.id.pullToRefresh);
+        PtrClassicDefaultHeader headerView = (PtrClassicDefaultHeader) pullToRefresh.getHeaderView();
+        final StoreHouseHeader newHeader = new StoreHouseHeader(pullToRefresh.getContext());
+        newHeader.setBackgroundResource(R.color.colorPrimary);
+        headerView.setBackgroundResource(R.color.colorPrimary);
+
+        newHeader.setDropHeight(200);
+        //newHeader.setMinimumHeight(300);
+
+        ImageView wolfSpinner = new ImageView(this);
+        wolfSpinner.setBackgroundResource(R.drawable.wolf_spinner);
+        wolfSpinner.setLayoutParams(new ViewGroup.LayoutParams(100, 100));
+        wolfSpinner.setScaleType(ImageView.ScaleType.FIT_XY);
+
+        ImageView glassesSpinner = new ImageView(this);
+        glassesSpinner.setBackgroundResource(R.drawable.glasses_spinner);
+        glassesSpinner.setLayoutParams(new ViewGroup.LayoutParams(100, 100));
+        glassesSpinner.setScaleType(ImageView.ScaleType.FIT_XY);
+
+        final ImageView wolf = (ImageView) findViewById(R.id.wolfSpinner);
+        final ImageView glasses = (ImageView) findViewById(R.id.glassesSpinner);
+
+        wolf.setVisibility(View.GONE);
+        glasses.setVisibility(View.GONE);
+
+        wolf.setX(50);
+        glasses.setX(getWindowManager().getDefaultDisplay().getWidth() - 260);
+
+        //newHeader.addView(wolfSpinner);
+        //newHeader.add
+        newHeader.setPadding(0, 25, 0, 25);
+        newHeader.setBackgroundColor(Color.argb(0, 255, 255, 255));
+
+        final ValueAnimator colorAnimation = ValueAnimator.ofInt(0, 255*5);
+        colorAnimation.setDuration(2000);
+        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+
+                int value = (Integer) animator.getAnimatedValue() % 510;
+                int alpha = 0;
+                if(value < 255) {
+                    alpha = value;
+                } else if (value > 255){
+                    alpha = 510 - value;
+                }
+                System.out.println("Alpha: " + alpha);
+
+                newHeader.setBackgroundColor(Color.argb(alpha, 0, 169, 255));
+            }
+
+        });
+        //colorAnimation.setDuration(500);
+
+        newHeader.initWithString("Work dammit");
+        headerView.addView(glassesSpinner);
+
+        pullToRefresh.setHeaderView(newHeader);
+
+        pullToRefresh.setPtrHandler(new PtrDefaultHandler() {
+            @Override
+            public void onRefreshBegin(final PtrFrameLayout frame) {
+                frame.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        dataManager.refresh();
+                        frame.refreshComplete();
+                        Log.d("Refresh", "Refreshing complete");
+                    }
+                }, 1800);
+
+            }
+        });
+
+        pullToRefresh.addPtrUIHandler(new PtrUIHandler() {
+            @Override
+            public void onUIReset(PtrFrameLayout frameLayout) {
+                newHeader.setBackgroundColor(Color.argb(0, 255, 255, 255));
+                wolf.setX(50);
+                glasses.setX(getWindowManager().getDefaultDisplay().getWidth() - 260);
+            }
+
+            @Override
+            public void onUIRefreshPrepare(PtrFrameLayout frameLayout) {
+                wolf.setVisibility(View.VISIBLE);
+                glasses.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onUIRefreshBegin(PtrFrameLayout frameLayout) {
+                colorAnimation.start();
+            }
+
+            @Override
+            public void onUIRefreshComplete(PtrFrameLayout frameLayout) {
+                colorAnimation.end();
+            }
+
+            @Override
+            public void onUIPositionChange(PtrFrameLayout frameLayout, boolean b, byte b1, PtrIndicator ptrIndicator) {
+                //System.out.println(eventList.getY());
+                float yOffSet = eventList.getY();
+
+                
+                float wolfX = wolf.getX() + yOffSet/12;
+                float glassesX = glasses.getX() - yOffSet/12;
+                float wolfMaxOffset = (getWindowManager().getDefaultDisplay().getWidth() - wolf.getLayoutParams().width)/2;
+                float glassesMaxOffset = (getWindowManager().getDefaultDisplay().getWidth() - glasses.getLayoutParams().width)/2;
+
+                wolf.setX(min(wolfX, wolfMaxOffset));
+                glasses.setX(max(glassesX, glassesMaxOffset));
+            }
+        });
+
+
+
+        // Go to login screen if no user not currently logged in
+        Intent login = new Intent(this, LoginA.class);
+
+        try{
+            currentUser = ParseUser.getCurrentUser();
+            if(currentUser == null) {
+                startActivity(login);
+            } else {
+                currentUser.fetchInBackground();
+                getLocation();
+            }
+        } catch (Exception e) {
+            startActivity(login);
+        }
+    }
+
+    public float min(float f1, float f2) {
+        if(f1 < f2)
+            return(f1);
+        else
+            return(f2);
+    }
+
+    public float max(float f1, float f2) {
+        if(f1 > f2)
+            return(f1);
+        else
+            return(f2);
+    }
 
 }
