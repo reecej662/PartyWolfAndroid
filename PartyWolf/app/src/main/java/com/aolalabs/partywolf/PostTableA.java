@@ -29,22 +29,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.daimajia.swipe.SwipeLayout;
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseRelation;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 import com.victor.loading.rotate.RotateLoading;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
 
 //import com.walnutlabs.android.ProgressHUD;
 
@@ -63,11 +54,9 @@ import java.util.List;
 
 public class PostTableA extends Activity implements OnClickListener{
     private ListView eventList;
-    private List<Event> events = new ArrayList<>();
-    private List<Event> sortedEvents = new ArrayList<>();
-    private List<ParseObject> parseEvents = new ArrayList<>();
-    private List<Event> upvoteEvents = new ArrayList<>();
-    private List<ParseObject> upvoteObjects = new ArrayList<>();
+
+    private PostDataManager dataManager;
+
     private ImageButton newPostButton;
     private Button hypeButton;
     private Button dateButton;
@@ -87,9 +76,25 @@ public class PostTableA extends Activity implements OnClickListener{
         loadingDialog = showLoadingDialog();
         loadingDialog.show();
 
+        final SwipeRefreshLayout pullToRefresh = (SwipeRefreshLayout) findViewById(R.id.pullToRefresh);
+
+        dataManager = new PostDataManager(this);
+        dataManager.setDataListener(new PostDataManager.DataListener() {
+            @Override
+            public void onDataLoaded() {
+                Log.d("dataManager", "Data loaded");
+                populateListView(dataManager.events);
+                registerClickCallback();
+                loadingDialog.dismiss();
+                pullToRefresh.setRefreshing(false);
+            }
+        });
+
+        dataManager.getData();
+
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        populateEventList();
-        populateListView((ArrayList<Event>) events);
+
+        populateListView(dataManager.events);
         registerClickCallback();
 
         newPostButton = (ImageButton) findViewById(R.id.newPostButton);
@@ -97,7 +102,7 @@ public class PostTableA extends Activity implements OnClickListener{
         hypeButton = (Button) findViewById(R.id.hypeOption);
         dateButton = (Button) findViewById(R.id.dateOption);
         settingsButton = (ImageButton) findViewById(R.id.settingsButton);
-        final SwipeRefreshLayout pullToRefresh = (SwipeRefreshLayout) findViewById(R.id.pullToRefresh);
+
 
 
         pullToRefresh.setColorSchemeResources(R.color.ColorPrimary);
@@ -116,17 +121,10 @@ public class PostTableA extends Activity implements OnClickListener{
                 (new Handler()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        pullToRefresh.setRefreshing(false);
-                        events.removeAll(events);
-                        upvoteEvents.removeAll(upvoteEvents);
-                        upvoteObjects.removeAll(upvoteObjects);
-                        populateEventList();
-                        //populateListView((ArrayList<Event>) events);
-                        loadUpvoteData();
-                        populateEventList();
+                        dataManager.refresh();
                         System.out.println("Now we're done refreshing");
                     }
-                }, 3000);
+                }, 2000);
             }
         });
 
@@ -139,23 +137,17 @@ public class PostTableA extends Activity implements OnClickListener{
                 startActivity(login);
             } else {
                 currentUser.fetchInBackground();
-
                 getLocation();
             }
         } catch (Exception e) {
             startActivity(login);
         }
-        
+
         // Load the posts the user has updated
 //        System.out.println("Confirmed: " + currentUser.getBoolean("confirmed"));
 
-    }
+        Log.d("On create:", "Finished on create");
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //loadUpvoteData();
-        System.out.println("Resuming activity");
     }
 
     //9722610049
@@ -180,7 +172,7 @@ public class PostTableA extends Activity implements OnClickListener{
             // The corresponding object that the row describes
             ParseObject object = (ParseObject) hypeButton.getTag();
 
-            upvoteEvent(object);
+            dataManager.upvoteEvent(object);
 
             hypeButton.setText("unvote");
 
@@ -198,67 +190,11 @@ public class PostTableA extends Activity implements OnClickListener{
             // Get the corresponding object from the row
             ParseObject object = (ParseObject) hypeButton.getTag();
 
-            unvoteEvent(object);
+            dataManager.unvoteEvent(object);
 
             hypeButton.setText("vote");
 
         }
-    }
-
-    private void populateEventList() {
-
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Posts");
-
-        Date today = new Date();
-        GregorianCalendar calendar = new GregorianCalendar();
-        Date startOfDay = calendar.getTime();
-        startOfDay.setHours(0);
-        startOfDay.setMinutes(0);
-        startOfDay.setSeconds(0);
-
-        Date oneWeek = new Date(today.getTime()+604800000);
-
-        /*SimpleDateFormat sdf = new SimpleDateFormat("EEEE");;
-        final String weekDay =  sdf.format(calendar.getTime());*/
-
-        try {
-            //ParseObject university = currentUser.getParseObject("university");
-            //ParseObject realUniversity = ParseObject.createWithoutData("Universities", university.getObjectId());
-            //query.whereEqualTo("university", realUniversity);
-            query.whereEqualTo("approved", true);
-            query.whereGreaterThanOrEqualTo("date", startOfDay);
-            query.whereLessThanOrEqualTo("date", oneWeek);
-            query.include("university");
-        } catch (Exception e) {
-            query.whereEqualTo("nothing", false);
-        }
-
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> postList, ParseException e) {
-                try {
-                    if (e == null) {
-                        for (ParseObject object : postList) {
-//                            if((eventInArea(object) && !object.getBoolean("onCampus"))
-//                                    || (currentUser.get("university").equals(object.get("university")))) {
-                            events.add(new Event(object));
-                            parseEvents.add(object);
-//                            } else {
-//                                System.out.println("Event not in local area");
-//                            }
-                        }
-                    } else {
-                        e.printStackTrace();
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                } finally {
-                    sortByHype();
-                    populateListView((ArrayList<Event>) events);
-                }
-            }
-        });
-
     }
 
     private void populateListView(ArrayList<Event> events) {
@@ -278,9 +214,9 @@ public class PostTableA extends Activity implements OnClickListener{
                 System.out.println(viewClicked.getId());
                 Event clickedEvent;
                 if (dateView) {
-                    clickedEvent = events.get(position);
+                    clickedEvent = dataManager.getEventAtIndex(position);
                 } else {
-                    clickedEvent = sortedEvents.get(position);
+                    clickedEvent = dataManager.getSortedEventAtIndex(position);
                 }
                 Intent i = new Intent(PostTableA.this, EventDetailA.class);
                 i.putExtra("event", clickedEvent);
@@ -298,12 +234,12 @@ public class PostTableA extends Activity implements OnClickListener{
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             // Make sure we have a view to work with (may have been given null)
             if (dateView) {
-                events = (ArrayList<Event>) PostTableA.this.events;
+                events = dataManager.events;
             } else {
-                events = (ArrayList<Event>) PostTableA.this.sortedEvents;
+                events = dataManager.sortedEvents;
             }
 
             View itemView = convertView;
@@ -326,8 +262,7 @@ public class PostTableA extends Activity implements OnClickListener{
             SwipeLayout swipeLayout =  (SwipeLayout) itemView.findViewById(R.id.swipeLayout);
             final Button reportButton = (Button) itemView.findViewById(R.id.report_button);
 
-
-            button.setTag(parseObjectForEvent(currentEvent));
+            button.setTag(dataManager.parseObjectForEvent(currentEvent));
 
             int height = daySection.getLayoutParams().height;
             Event previousEvent = new Event();
@@ -356,7 +291,7 @@ public class PostTableA extends Activity implements OnClickListener{
             // Default case
             upvotes.setTextColor(Color.rgb(0, 0, 0));
 
-            if(userUpvoted(currentEvent) != null) {
+            if(dataManager.userUpvoted(currentEvent) != null) {
                 upvotes.setTextColor(Color.rgb(0, 169, 255));
                 button.setBackgroundResource(R.drawable.bluevote);
                 button.setText("unvote");
@@ -377,7 +312,7 @@ public class PostTableA extends Activity implements OnClickListener{
                     if (dateView) {
                         clickedEvent = events.get(elementPosition);
                     } else {
-                        clickedEvent = sortedEvents.get(elementPosition);
+                        clickedEvent = dataManager.getSortedEventAtIndex(elementPosition);
                     }
                     Intent i = new Intent(PostTableA.this, EventDetailA.class);
                     i.putExtra("event", clickedEvent);
@@ -431,7 +366,7 @@ public class PostTableA extends Activity implements OnClickListener{
                 public void onClick(View v) {
                     Toast reportToast = Toast.makeText(PostTableA.this, "Event reported. Thanks!", Toast.LENGTH_LONG);
                     reportToast.show();
-                    Report newReport = new Report("Problem with event", parseObjectForEvent(currentEvent), PostTableA.this);
+                    Report newReport = new Report("Problem with event", dataManager.parseObjectForEvent(currentEvent), PostTableA.this);
                     newReport.submit();
                 }
             });
@@ -455,15 +390,15 @@ public class PostTableA extends Activity implements OnClickListener{
                 v.setBackgroundResource(R.drawable.selection_bg);
                 findViewById(R.id.hypeOption).setBackgroundResource(R.drawable.selection_blank_bg);
                 dateView = true;
-                populateListView((ArrayList<Event>) events);
+                populateListView(dataManager.getEvents());
                 registerClickCallback();
                 break;
             case R.id.hypeOption:
                 v.setBackgroundResource(R.drawable.selection_bg);
                 findViewById(R.id.dateOption).setBackgroundResource(R.drawable.selection_blank_bg);
                 dateView = false;
-                sortByHype();
-                populateListView((ArrayList<Event>) sortedEvents);
+                //sortByHype();
+                populateListView(dataManager.getSortedEvents());
                 registerClickCallback();
                 break;
             case R.id.settingsButton:
@@ -473,157 +408,6 @@ public class PostTableA extends Activity implements OnClickListener{
             default:
                 i = new Intent(this, NewPostA.class);
                 startActivity(i);
-        }
-    }
-
-    public void sortByHype() {
-        sortedEvents.removeAll(sortedEvents);
-        sortedEvents.addAll(events);
-        Collections.sort(sortedEvents);
-    }
-
-
-    public void loadUpvoteData() {
-        ParseRelation upvoteRelation = currentUser.getRelation("upvote_data");
-        ParseQuery<ParseObject> upvoteQuery = upvoteRelation.getQuery();
-
-        try {
-            upvoteQuery.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(List<ParseObject> list, ParseException e) {
-                    if(list != null) {
-                        for (ParseObject object : list) {
-                            upvoteEvents.add(new Event(object));
-                            upvoteObjects.add(object);
-                        }
-                    } else {
-                        System.err.println("Error connecting to the network");
-                        Toast networkToast = Toast.makeText(PostTableA.this, "Error connecting to the network", Toast.LENGTH_LONG);
-                        networkToast.show();
-                    }
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public ParseObject parseObjectForEvent(Event e) {
-        for(ParseObject object : parseEvents) {
-            if(object.getObjectId().equals(e.getObjectID())) {
-                return object;
-            }
-        }
-        return null;
-    }
-
-    public Event userUpvoted(Event event) {
-        for(Event upvoted : upvoteEvents) {
-            if(event.getObjectID().equals(upvoted.getObjectID())){
-                return upvoted;
-            }
-        }
-        return null;
-    }
-
-    public void unvoteEvent(ParseObject object) {
-
-        // Change the values for the locally stored Event
-        Event upvotedEvent = null;
-        for (Event event : events) {
-            if ((upvotedEvent = userUpvoted(event)) != null) {
-                event.unvote();
-                upvoteEvents.remove(upvotedEvent);
-                System.out.println("User unvoted the event");
-                System.out.println("upvoteEvents count: " + upvoteEvents.size());
-            }
-        }
-
-        upvoteObjects.remove(object);
-
-        // Add the new user to the object upvote relation and increment number
-        try {
-            // Change the values for the parse object
-            object.increment("upvotes", -1);
-            object.getRelation("upvote_data").remove(currentUser);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-
-            object.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e != null)
-                        Log.d("Object saving error", e.toString());
-                    System.out.println("Post updated");
-                }
-            });
-        }
-
-        // Add the new post to the user's list of upvoted posts
-        try {
-            ParseUser.getCurrentUser().getRelation("upvote_data").remove(object);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-
-            currentUser.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e != null)
-                        Log.d("User saving error", e.toString());
-                    System.out.println("User updated");
-                }
-            });
-        }
-
-    }
-
-    public void upvoteEvent(final ParseObject object) {
-
-        // Get the coresponding event in the local array and add to the upvoted list
-        for (Event event : events) {
-            if (event.getObjectID().equals(object.getObjectId())) {
-                upvoteEvents.add(event);
-                event.upvote();
-            }
-        }
-
-        upvoteObjects.add(object);
-
-        // Add the current user to the object's upvote relation and increment the count
-        try {
-            object.increment("upvotes", 1);
-            object.getRelation("upvote_data").add(ParseUser.getCurrentUser());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            object.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e != null)
-                        Log.d("Object saving error", e.toString());
-                    System.out.println("New upvote count: " + object.getNumber("upvotes"));
-                    System.out.println("Post updated");
-                }
-            });
-        }
-
-        // Remove the object from the current user's upvoted objects
-        try {
-            currentUser.getRelation("upvote_data").add(object);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            currentUser.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e != null)
-                        Log.d("User saving error", e.toString());
-                    System.out.println("User updated");
-                }
-            });
         }
     }
 
