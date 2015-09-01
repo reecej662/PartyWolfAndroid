@@ -1,18 +1,23 @@
 package com.aolalabs.partywolf;
 
 import android.app.Activity;
+import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Created by reecejackson on 8/28/15.
@@ -29,6 +34,7 @@ public class PostDataManager {
     protected List<ParseObject> upvoteObjects = new ArrayList<>();
     private Activity context;
     private DataListener listener;
+    private Location userLocation = null;
 
     public PostDataManager(Activity context){
         this.context = context;
@@ -123,13 +129,13 @@ public class PostDataManager {
                 try {
                     if (e == null) {
                         for (ParseObject object : postList) {
-//                            if((eventInArea(object) && !object.getBoolean("onCampus"))
-//                                    || (currentUser.get("university").equals(object.get("university")))) {
-                            events.add(new Event(object));
-                            parseEvents.add(object);
-//                            } else {
-//                                System.out.println("Event not in local area");
-//                            }
+                            if((eventInArea(object) && !object.getBoolean("onCampus"))
+                                   || (currentUser.get("university").equals(object.get("university")))) {
+                                events.add(new Event(object));
+                                parseEvents.add(object);
+                            } else {
+                                System.out.println("Event not in local area");
+                            }
                         }
                     } else {
                         e.printStackTrace();
@@ -304,5 +310,36 @@ public class PostDataManager {
 
     public void setDataListener(DataListener listener) {
         this.listener = listener;
+    }
+
+    public boolean eventInArea(ParseObject object) {
+
+        ParseGeoPoint eventLocation = object.getParseGeoPoint("postLocation");
+        try {
+            System.out.println("Latitude: " + this.userLocation.getLatitude() + " Longitude: " + this.userLocation.getLongitude());
+        } catch (Exception e) {
+            System.out.println("Location was null");
+        }
+
+        ParseGeoPoint userLocation = new ParseGeoPoint(this.userLocation.getLatitude(), this.userLocation.getLongitude());
+
+        Double distance = eventLocation.distanceInMilesTo(userLocation);
+        System.out.println(this.userLocation);
+        System.out.println(distance);
+
+        if (distance < 10) {
+            return (true);
+        } else {
+            return (false);
+        }
+
+    }
+
+    public Location getUserLocation() {
+        return userLocation;
+    }
+
+    public void setUserLocation(Location userLocation) {
+        this.userLocation = userLocation;
     }
 }

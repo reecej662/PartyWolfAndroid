@@ -39,13 +39,14 @@
             android:layout_height="fill_parent"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
+            android:paddingRight="5dp"
             android:text="@string/submit"
             android:textSize="18sp"
             android:id="@+id/post"
             android:background="@android:color/transparent"
             style="@style/add_button_text_white"
             android:onClick="newPost"
-            android:visibility="invisible"/>
+            android:visibility="visible"/>
 
     </RelativeLayout>
 
@@ -70,7 +71,7 @@
 
         <EditText
             android:layout_width="match_parent"
-            android:layout_height="320dp"
+            android:layout_height="270dp"
             android:hint="@string/event_description"
             android:id="@+id/event_description"
             android:textColorHint="#d3d3d3"
@@ -152,6 +153,28 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="50dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Tap below to enter the date"
+                android:id="@+id/date_text"
+                android:textColorHint="#d3d3d3"
+                android:textSize="18sp"
+                android:gravity="left"
+                android:padding="12dp"
+                android:textColor="@color/Black"
+                android:layout_weight="2"
+                android:singleLine="true"
+                android:onClick="setDate"
+                android:visibility="visible"
+                android:nextFocusDown="@+id/new_date"/>
+
+        </LinearLayout>
+
         <Button
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -162,33 +185,6 @@
             style="@style/add_button_text_white"
             android:onClick="setDate"/>
 
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/new_time"
-            android:id="@+id/new_time"
-            android:background="#73e773"
-            style="@style/add_button_text_white"
-            android:onClick="setTime"
-            android:visibility="gone"/>
-
     </LinearLayout>
-
-    <DatePicker
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/eventDate"
-        android:visibility="gone"
-        android:headerBackground="@color/ColorPrimary"
-        android:layout_below="@id/topBar"
-        />
-
-    <TimePicker
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/eventTime"
-        android:visibility="gone"
-        android:headerBackground="@color/ColorPrimary"
-        android:layout_below="@id/eventDate"/>
 
 </RelativeLayout>

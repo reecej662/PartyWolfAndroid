@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -36,6 +38,8 @@ import com.victor.loading.rotate.RotateLoading;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import in.srain.cube.views.ptr.PtrClassicDefaultHeader;
 import in.srain.cube.views.ptr.PtrDefaultHandler;
@@ -81,10 +85,24 @@ public class PostTableA extends Activity implements OnClickListener{
         super.onCreate(savedInstance);
         setContentView(R.layout.posts_table);
 
+        // Go to login screen if no user not currently logged in
+        Intent login = new Intent(this, LoginA.class);
+
+        try{
+            currentUser = ParseUser.getCurrentUser();
+            Log.d("Curent user", currentUser.toString());
+            if(currentUser == null) {
+                startActivity(login);
+            } else {
+                currentUser.fetchInBackground();
+                getLocation();
+            }
+        } catch (Exception e) {
+            startActivity(login);
+        }
+
         loadingDialog = showLoadingDialog();
         loadingDialog.show();
-
-        //final SwipeRefreshLayout pullToRefresh = (SwipeRefreshLayout) findViewById(R.id.pullToRefresh);
 
         dataManager = new PostDataManager(this);
         dataManager.setDataListener(new PostDataManager.DataListener() {
@@ -103,6 +121,8 @@ public class PostTableA extends Activity implements OnClickListener{
         dataManager.getData();
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        dataManager.setUserLocation(userLocation);
 
         populateListView(dataManager.events);
         registerClickCallback();
@@ -113,36 +133,12 @@ public class PostTableA extends Activity implements OnClickListener{
         dateButton = (Button) findViewById(R.id.dateOption);
         settingsButton = (ImageButton) findViewById(R.id.settingsButton);
 
-
-
-        //pullToRefresh.setColorSchemeResources(R.color.ColorPrimary);
-
         setUpPullToRefresh();
 
         newPostButton.setOnClickListener(this);
         hypeButton.setOnClickListener(this);
         dateButton.setOnClickListener(this);
         settingsButton.setOnClickListener(this);
-
-//        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                pullToRefresh.setRefreshing(true);
-//                System.out.println("Refreshed");
-//                Log.d("Swipe", "Refreshing Number");
-//                (new Handler()).postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        dataManager.refresh();
-//                        System.out.println("Now we're done refreshing");
-//                    }
-//                }, 2000);
-//            }
-//        });
-
-
-        // Load the posts the user has updated
-//        System.out.println("Confirmed: " + currentUser.getBoolean("confirmed"));
 
         Log.d("On create:", "Finished on create");
 
@@ -201,6 +197,7 @@ public class PostTableA extends Activity implements OnClickListener{
 
         // Configure the list view
         ListView list = (ListView) findViewById(R.id.main_list_view);
+        list.setDivider(null);
         list.setAdapter(adapter);
     }
 
@@ -382,6 +379,10 @@ public class PostTableA extends Activity implements OnClickListener{
         switch(v.getId()) {
             case R.id.newPostButton:
                 i = new Intent(this, Add.class);
+                if(userLocation == null) {
+                    userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                }
+                i.putExtra("location", userLocation);
                 startActivity(i);
                 break;
             case R.id.dateOption:
@@ -434,8 +435,23 @@ public class PostTableA extends Activity implements OnClickListener{
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                double lat = location.getLatitude();
+                double lng = location.getLongitude();
+
                 userLocation = location;
-                //loadUpvoteData();
+                dataManager.setUserLocation(userLocation);
+                currentUser.put("currentLocation", new ParseGeoPoint(lat, lng));
+
+                Geocoder geoCoder = new Geocoder(PostTableA.this, Locale.getDefault());
+                try {
+                    List<Address> address = geoCoder.getFromLocation(lat, lng, 1);
+                    String city = address.get(0).getLocality();
+
+                    currentUser.put("currentCity", city);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -457,31 +473,6 @@ public class PostTableA extends Activity implements OnClickListener{
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 
     }
-
-    public boolean eventInArea(ParseObject object) {
-
-        ParseGeoPoint eventLocation = object.getParseGeoPoint("postLocation");
-        try {
-            System.out.println("Latitude: " + this.userLocation.getLatitude() + " Longitude: " + this.userLocation.getLongitude());
-        } catch (Exception e) {
-            this.userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            System.out.println("Used last known location");
-        }
-
-        ParseGeoPoint userLocation = new ParseGeoPoint(this.userLocation.getLatitude(), this.userLocation.getLongitude());
-
-        Double distance = eventLocation.distanceInMilesTo(userLocation);
-        System.out.println(this.userLocation);
-        System.out.println(distance);
-
-        if (distance < 10) {
-            return (true);
-        } else {
-            return (false);
-        }
-
-    }
-
 
     public void setUpPullToRefresh() {
         PtrFrameLayout pullToRefresh = (PtrFrameLayout) findViewById(R.id.pullToRefresh);
@@ -517,19 +508,19 @@ public class PostTableA extends Activity implements OnClickListener{
         newHeader.setPadding(0, 25, 0, 25);
         newHeader.setBackgroundColor(Color.argb(0, 255, 255, 255));
 
-        final ValueAnimator colorAnimation = ValueAnimator.ofInt(0, 255*5);
+        final ValueAnimator colorAnimation = ValueAnimator.ofInt(0, 200*5);
         colorAnimation.setDuration(2000);
         colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
             @Override
             public void onAnimationUpdate(ValueAnimator animator) {
 
-                int value = (Integer) animator.getAnimatedValue() % 510;
+                int value = (Integer) animator.getAnimatedValue() % 400;
                 int alpha = 0;
-                if(value < 255) {
+                if(value < 200) {
                     alpha = value;
-                } else if (value > 255){
-                    alpha = 510 - value;
+                } else if (value > 200){
+                    alpha = 200 - value;
                 }
                 System.out.println("Alpha: " + alpha);
 
@@ -588,7 +579,7 @@ public class PostTableA extends Activity implements OnClickListener{
                 //System.out.println(eventList.getY());
                 float yOffSet = eventList.getY();
 
-                
+
                 float wolfX = wolf.getX() + yOffSet/12;
                 float glassesX = glasses.getX() - yOffSet/12;
                 float wolfMaxOffset = (getWindowManager().getDefaultDisplay().getWidth() - wolf.getLayoutParams().width)/2;
@@ -599,22 +590,6 @@ public class PostTableA extends Activity implements OnClickListener{
             }
         });
 
-
-
-        // Go to login screen if no user not currently logged in
-        Intent login = new Intent(this, LoginA.class);
-
-        try{
-            currentUser = ParseUser.getCurrentUser();
-            if(currentUser == null) {
-                startActivity(login);
-            } else {
-                currentUser.fetchInBackground();
-                getLocation();
-            }
-        } catch (Exception e) {
-            startActivity(login);
-        }
     }
 
     public float min(float f1, float f2) {

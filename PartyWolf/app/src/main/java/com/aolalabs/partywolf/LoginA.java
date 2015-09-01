@@ -27,6 +27,7 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.json.JSONObject;
 
@@ -37,6 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class LoginA extends Activity implements OnClickListener {
+    ParseUser currentUser = ParseUser.getCurrentUser();
 
     List<String> permissions = Arrays.asList("public_profile", "user_friends", "user_location", "email");
     CallbackManager callbackManager;
@@ -97,8 +99,7 @@ public class LoginA extends Activity implements OnClickListener {
                 //System.out.println(AccessToken.getCurrentAccessToken().getPermissions());
                 break;
             case R.id.fbLoginButton:
-                System.out.println("They wanna log in...");
-
+                System.out.println("Log in button pressed");
                 logInFacebook();
                 //System.out.println(LoginManager.getInstance().a);
                 break;
@@ -121,6 +122,7 @@ public class LoginA extends Activity implements OnClickListener {
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException e) {
+                System.out.println(user);
                 if (user == null) {
                     Log.d("MyApp", "Uh oh. The user cancelled the Facebook login.");
                 } else if (user.isNew()) {
@@ -130,7 +132,8 @@ public class LoginA extends Activity implements OnClickListener {
                     } catch (Exception ex) {
                         System.err.println(ex);
                     } finally {
-                        Intent i = new Intent(LoginA.this, PostTableA.class);
+                        System.out.println("Now login A user " + ParseUser.getCurrentUser());
+                        Intent i = new Intent(LoginA.this, AddEmailA.class);
                         startActivity(i);
                     }
                 } else {
@@ -147,16 +150,15 @@ public class LoginA extends Activity implements OnClickListener {
             }
         });
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        String fbID = "";
+        //String fbID = "";
+//
+//        try {
+//            wait(1000);
+//        } catch (Exception e) {
+//            System.err.println(e);
+//        }
 
-        try {
-            wait(1000);
-        } catch (Exception e) {
-            System.err.println(e);
-        }
-
-        try {
+        /*try {
             fbID = currentUser.getString("fbID");
             if(!fbID.equals("")) {
                 System.out.println(fbID);
@@ -166,9 +168,9 @@ public class LoginA extends Activity implements OnClickListener {
                 newUserSignUp();
             }
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
             newUserSignUp();
-        }
+        }*/
 
     }
 
@@ -180,20 +182,37 @@ public class LoginA extends Activity implements OnClickListener {
                     @Override
                     public void onCompleted(JSONObject user, GraphResponse response) {
 
-                        System.out.println(user);
-                        ParseUser currentUser = ParseUser.getCurrentUser();
+                        Log.d("JSONObject user", user.toString());
+                        try {
+                            Log.d("fbId", user.getString("id").toString());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        System.out.println(currentUser);
                         //System.out.println("Parse user: " + currentUser.getString("first_name"));
 
                         String fbID = "";
 
-                        try {
-                            System.out.println(user);
+                        if (currentUser == null) {
+                            currentUser = ParseUser.getCurrentUser();
+                        }
 
-                            fbID = user.getString("fbID");
+                        if(currentUser == null) {
+                            System.out.println("current user is still null");
+                            currentUser = new ParseUser();
+                        }
+
+                        try {
+                            System.out.println("User recieved from JSON" + user);
+
+                            fbID = user.getString("id");
+                            Log.d("fbID", fbID);
                             currentUser.put("fbLinked", true);
                             currentUser.put("fbID", fbID);
 
                             String firstName = user.getString("first_name");
+                            Log.d("firstName", firstName);
                             currentUser.put("first_name", firstName);
 
                             String lastName = user.getString("last_name");
@@ -202,8 +221,9 @@ public class LoginA extends Activity implements OnClickListener {
                             String gender = user.getString("gender");
                             currentUser.put("gender", gender);
 
-                            String location = user.getString("location");
-                            currentUser.put("hometown", location);
+                            JSONObject location = (JSONObject) user.get("location");
+                            String hometown = location.getString("name");
+                            currentUser.put("hometown", hometown);
 
                             currentUser.put("banned", "false");
                             currentUser.put("confirmed", false);
@@ -215,7 +235,7 @@ public class LoginA extends Activity implements OnClickListener {
                             currentUser.put("onHype", -1);
 
                         } catch (Exception e) {
-                            System.err.println(e);
+                            e.printStackTrace();
                         }
 
                         // Get profile picture
@@ -248,9 +268,14 @@ public class LoginA extends Activity implements OnClickListener {
                         }
 
                         try {
-                            currentUser.saveInBackground();
+                            currentUser.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+
+                                }
+                            });
                         } catch (Exception e) {
-                            System.err.println(e);
+                            e.printStackTrace();
                         }
 
                     }
@@ -260,6 +285,7 @@ public class LoginA extends Activity implements OnClickListener {
         parameters.putString("fields", "id,first_name,last_name,gender,link,location,email");
         request.setParameters(parameters);
         request.executeAsync();
+        System.out.println("We're getting here");
 
     }
 

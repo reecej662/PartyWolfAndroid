@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:id="@+id/activityRoot"
+    android:windowSoftInputMode="adjustResize">
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:src="@drawable/login_bg"
+        android:scaleType="fitXY" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/email_back"
+        android:textSize="14sp"
+        android:textColor="#ffffff"
+        android:onClick="back"
+        style="?android:attr/borderlessButtonStyle"/>
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_centerInParent="true"
+        android:background="#ffffff"
+        android:hint="Your .edu email"
+        android:gravity="center"
+        android:id="@+id/emailText"
+        android:inputType="textEmailAddress"
+        android:textColorHint="#d3d3d3"
+        android:textColor="@color/Black"
+        />
+
+    <TextView
+        android:layout_width="275dp"
+        android:layout_height="150dp"
+        android:text="@string/email"
+        android:textSize="16sp"
+        android:textColor="#ffffff"
+        android:layout_above="@id/emailText"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"/>
+
+    <Button
+        android:id="@+id/confirmationButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Send Confirmation Email"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:textSize="22sp"
+        android:textColor="#ffffff"
+        android:background="#1166ff"
+        android:onClick="emailSubmitted" />
+
+</RelativeLayout>

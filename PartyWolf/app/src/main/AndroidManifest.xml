@@ -33,6 +33,10 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".AddEmailA"
+            android:windowSoftInputMode="adjustPan|adjustResize"/>
+        <activity android:name=".ClassOfA"/>
+
         <activity android:name=".LoadingA"/>
         <activity android:name=".NewPostA"/>
         <activity android:name=".EventDetailA"/>

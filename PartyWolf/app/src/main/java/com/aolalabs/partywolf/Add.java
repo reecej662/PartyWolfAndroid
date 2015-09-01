@@ -1,23 +1,31 @@
 package com.aolalabs.partywolf;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
+import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Switch;
-import android.widget.TimePicker;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.jjobes.slidedatetimepicker.SlideDateTimeListener;
+import com.github.jjobes.slidedatetimepicker.SlideDateTimePicker;
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
-public class Add extends Activity {
+public class Add extends FragmentActivity {
 
     private EditText eventTitle;
     private EditText eventDescription;
@@ -25,12 +33,20 @@ public class Add extends Activity {
     private EditText host;
     private EditText fee;
     private LinearLayout horizontal_layout;
-    private int day,month,year, hour, minute;
+//    private int day,month,year, hour, minute;
+    private Date eventDate;
+    private ParseGeoPoint location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
+
+        Location userLocation = (Location) getIntent().getExtras().get("location");
+        System.out.println(userLocation);
+
+        if(userLocation != null)
+            location = new ParseGeoPoint(userLocation.getLatitude(), userLocation.getLongitude());
 
         eventTitle = (EditText) findViewById(R.id.event_name_title);
         eventDescription = (EditText) findViewById(R.id.event_description);
@@ -38,139 +54,113 @@ public class Add extends Activity {
         host = (EditText) findViewById(R.id.presented_by);
         fee = (EditText) findViewById(R.id.fee);
         horizontal_layout = (LinearLayout) findViewById(R.id.horizontal_layout);
-
-        DatePicker datePicker = (DatePicker) findViewById(R.id.eventDate);
-        datePicker.setMinDate(System.currentTimeMillis() - 1000);
-        datePicker.setMaxDate(System.currentTimeMillis() + 604800000);
     }
+
 
     public void setDate (View view){
-        Button aButton = (Button) findViewById(R.id.new_date);
-        aButton.setVisibility(View.GONE);
-        Button bButton = (Button) findViewById(R.id.new_time);
-        //bButton.setVisibility(View.VISIBLE);
-        DatePicker datePicker = (DatePicker) findViewById(R.id.eventDate);
-        datePicker.setVisibility(View.VISIBLE);
-        eventTitle.setVisibility(View.GONE);
-        eventDescription.setVisibility(View.GONE);
-        emoji.setVisibility(View.GONE);
-        host.setVisibility(View.GONE);
-        fee.setVisibility(View.GONE);
-        horizontal_layout.setVisibility(View.GONE);
-        TimePicker timePicker = (TimePicker) findViewById(R.id.eventTime);
-        timePicker.setVisibility(View.VISIBLE);
-        Button cButton = (Button) findViewById(R.id.post);
-        cButton.setVisibility(View.VISIBLE);
+        final SimpleDateFormat mFormatter = new SimpleDateFormat("EEEE MMMM dd, h:mm aa");
+        SlideDateTimeListener listener = new SlideDateTimeListener() {
+
+            @Override
+            public void onDateTimeSet(Date date)
+            {
+                Toast.makeText(Add.this, mFormatter.format(date), Toast.LENGTH_SHORT).show();
+                TextView dateText = (TextView) findViewById(R.id.date_text);
+                dateText.setVisibility(View.VISIBLE);
+                dateText.setText(mFormatter.format(date));
+                eventDate = date;
+            }
+
+            // Optional cancel listener
+            @Override
+            public void onDateTimeCancel()
+            {
+                Toast.makeText(Add.this, "Canceled", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        new SlideDateTimePicker.Builder(getSupportFragmentManager())
+                .setListener(listener)
+                .setInitialDate(new Date())
+                .setMaxDate(new Date(System.currentTimeMillis() + 604800000))
+                .setMinDate(new Date())
+                .setIndicatorColor(Color.rgb(0, 169, 255))
+                .build()
+                .show();
     }
 
-    public void setTime (View view){
-        Button bButton = (Button) findViewById(R.id.new_time);
-        bButton.setVisibility(View.GONE);
-        DatePicker datePicker = (DatePicker) findViewById(R.id.eventDate);
-        datePicker.setVisibility(View.GONE);
-        TimePicker timePicker = (TimePicker) findViewById(R.id.eventTime);
-        timePicker.setVisibility(View.VISIBLE);
-        Button cButton = (Button) findViewById(R.id.post);
-        cButton.setVisibility(View.VISIBLE);
-    }
-
-    public void hideCalendar (View view){
-        DatePicker datePicker = (DatePicker) findViewById(R.id.eventDate);
-        datePicker.setVisibility(View.GONE);
-    }
 
     public void newPost (View view) {
-        //Grab date and time and prepare to send to parse as one string
-        DatePicker datePicker = (DatePicker) findViewById(R.id.eventDate);
-        TimePicker selectedTime = (TimePicker) findViewById(R.id.eventTime);
-        selectedTime.clearFocus();
-        Calendar calendar = Calendar.getInstance();
-        year = calendar.get(Calendar.YEAR);
-        month = calendar.get(Calendar.MONTH);
-        day = calendar.get(Calendar.DAY_OF_MONTH);
-        hour = selectedTime.getCurrentHour();
-        minute = selectedTime.getCurrentMinute();
-        boolean minuteWrong = false;
-
-        //minuteWrong is a little fix to an issue with minute values that are less than 10; as they
-        //are recorded as "5", for example, instead of as "05"; the rest of the fix is just below
-        if (minute < 10){
-            minuteWrong = true;
-        }
-
-
-        String newYear = String.valueOf(year);
-        String newMonth = String.valueOf(month);
-        String newDay = String.valueOf(day);
-        String newHour = String.valueOf(hour);
-        String newMinute = String.valueOf(minute);
-
-        StringBuilder dateAndTime = new StringBuilder(getResources().getString(R.string.empty));
-
-        //Inefficient form of changing numeric months to letters
-        if (newMonth.equals(getResources().getString(R.string.one))) {
-            String lastMonth = (String) getResources().getString(R.string.jan);
-            dateAndTime.append(lastMonth);
-        }
-        if (newMonth.equals(getResources().getString(R.string.two))) {
-            String lastMonth = (String) getResources().getString(R.string.feb);
-            dateAndTime.append(lastMonth);
-        }
-        if (newMonth.equals(getResources().getString(R.string.three))) {
-            String lastMonth = (String) getResources().getString(R.string.mar);
-            dateAndTime.append(lastMonth);
-        }
-        if (newMonth.equals(getResources().getString(R.string.four))) {
-            String lastMonth = (String) getResources().getString(R.string.apr);
-            dateAndTime.append(lastMonth);
-        }
-        if (newMonth.equals(getResources().getString(R.string.five))) {
-            String lastMonth = (String) getResources().getString(R.string.may);
-            dateAndTime.append(lastMonth);
-        }
-        if (newMonth.equals(getResources().getString(R.string.six))) {
-            String lastMonth = (String) getResources().getString(R.string.jun);
-            dateAndTime.append(lastMonth);
-        }
-        if (newMonth.equals(getResources().getString(R.string.seven))) {
-            String lastMonth = (String) getResources().getString(R.string.jul);
-            dateAndTime.append(lastMonth);
-        }
-        if (newMonth.equals(getResources().getString(R.string.eight))) {
-            String lastMonth = (String) getResources().getString(R.string.aug);
-            dateAndTime.append(lastMonth);
-        }
-        if (newMonth.equals(getResources().getString(R.string.nine))) {
-            String lastMonth = (String) getResources().getString(R.string.sep);
-            dateAndTime.append(lastMonth);
-        }
-        if (newMonth.equals(getResources().getString(R.string.ten))) {
-            String lastMonth = (String) getResources().getString(R.string.oct);
-            dateAndTime.append(lastMonth);
-        }
-        if (newMonth.equals(getResources().getString(R.string.eleven))) {
-            String lastMonth = (String) getResources().getString(R.string.nov);
-            dateAndTime.append(lastMonth);
-        }
-        if (newMonth.equals(getResources().getString(R.string.twelve))) {
-            String lastMonth = (String) getResources().getString(R.string.dec);
-            dateAndTime.append(lastMonth);
-        }
-
-        dateAndTime.append(getResources().getString(R.string.space));
-        dateAndTime.append(newDay);
-        dateAndTime.append(getResources().getString(R.string.comma));
-        dateAndTime.append(newYear);
-        dateAndTime.append(getResources().getString(R.string.comma));
-        dateAndTime.append(newHour);
-        dateAndTime.append(getResources().getString(R.string.colon));
-
-        if (minuteWrong) {
-            dateAndTime.append(getResources().getString(R.string.zero));
-        }
-        dateAndTime.append(newMinute);
-
-
+//        String newYear = String.valueOf(year);
+//        String newMonth = String.valueOf(month);
+//        String newDay = String.valueOf(day);
+//        String newHour = String.valueOf(hour);
+//        String newMinute = String.valueOf(minute);
+//
+//        StringBuilder dateAndTime = new StringBuilder(getResources().getString(R.string.empty));
+//
+//        //Inefficient form of changing numeric months to letters
+//        if (newMonth.equals(getResources().getString(R.string.one))) {
+//            String lastMonth = (String) getResources().getString(R.string.jan);
+//            dateAndTime.append(lastMonth);
+//        }
+//        if (newMonth.equals(getResources().getString(R.string.two))) {
+//            String lastMonth = (String) getResources().getString(R.string.feb);
+//            dateAndTime.append(lastMonth);
+//        }
+//        if (newMonth.equals(getResources().getString(R.string.three))) {
+//            String lastMonth = (String) getResources().getString(R.string.mar);
+//            dateAndTime.append(lastMonth);
+//        }
+//        if (newMonth.equals(getResources().getString(R.string.four))) {
+//            String lastMonth = (String) getResources().getString(R.string.apr);
+//            dateAndTime.append(lastMonth);
+//        }
+//        if (newMonth.equals(getResources().getString(R.string.five))) {
+//            String lastMonth = (String) getResources().getString(R.string.may);
+//            dateAndTime.append(lastMonth);
+//        }
+//        if (newMonth.equals(getResources().getString(R.string.six))) {
+//            String lastMonth = (String) getResources().getString(R.string.jun);
+//            dateAndTime.append(lastMonth);
+//        }
+//        if (newMonth.equals(getResources().getString(R.string.seven))) {
+//            String lastMonth = (String) getResources().getString(R.string.jul);
+//            dateAndTime.append(lastMonth);
+//        }
+//        if (newMonth.equals(getResources().getString(R.string.eight))) {
+//            String lastMonth = (String) getResources().getString(R.string.aug);
+//            dateAndTime.append(lastMonth);
+//        }
+//        if (newMonth.equals(getResources().getString(R.string.nine))) {
+//            String lastMonth = (String) getResources().getString(R.string.sep);
+//            dateAndTime.append(lastMonth);
+//        }
+//        if (newMonth.equals(getResources().getString(R.string.ten))) {
+//            String lastMonth = (String) getResources().getString(R.string.oct);
+//            dateAndTime.append(lastMonth);
+//        }
+//        if (newMonth.equals(getResources().getString(R.string.eleven))) {
+//            String lastMonth = (String) getResources().getString(R.string.nov);
+//            dateAndTime.append(lastMonth);
+//        }
+//        if (newMonth.equals(getResources().getString(R.string.twelve))) {
+//            String lastMonth = (String) getResources().getString(R.string.dec);
+//            dateAndTime.append(lastMonth);
+//        }
+//
+//        dateAndTime.append(getResources().getString(R.string.space));
+//        dateAndTime.append(newDay);
+//        dateAndTime.append(getResources().getString(R.string.comma));
+//        dateAndTime.append(newYear);
+//        dateAndTime.append(getResources().getString(R.string.comma));
+//        dateAndTime.append(newHour);
+//        dateAndTime.append(getResources().getString(R.string.colon));
+//
+//        if (minuteWrong) {
+//            dateAndTime.append(getResources().getString(R.string.zero));
+//        }
+//        dateAndTime.append(newMinute);
         final ProgressDialog dlg = new ProgressDialog(Add.this);
         dlg.setTitle("Please wait.");
         dlg.setMessage("Please wait.");
@@ -228,8 +218,6 @@ public class Add extends Activity {
 
         validationErrorMessage.append(getResources().getString(R.string.period));
 
-
-
         if (validationError) {
             Toast.makeText(Add.this, validationErrorMessage.toString(), Toast.LENGTH_LONG).show();
             dlg.dismiss();
@@ -261,20 +249,30 @@ public class Add extends Activity {
         event.put("description", eventDescription.getText().toString());
         event.put("emoji", emoji.getText().toString());
         event.put("host", host.getText().toString());
-        event.put("date", dateAndTime.toString());
+        event.put("date", eventDate);
         event.put("approved", false);
         event.put("fee", fee.getText().toString());
         event.put("upvotes", 0);
+        event.put("user", ParseUser.getCurrentUser());
+        event.put("university", ParseUser.getCurrentUser().get("university"));
         event.put("onCampus", onCampus);
-        event.saveInBackground();
+        event.put("postLocation", location);
+        event.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e != null) {
+                    Log.d("Error saving new event", e.toString());
+                } else {
+                    Log.d("New event", "Save complete!");
+                }
+            }
+        });
         dlg.dismiss();
 
         StringBuilder thanksForNewEventMessage = new StringBuilder(getResources().getString(R.string.thanks_for_new_event));
         Toast.makeText(Add.this, thanksForNewEventMessage.toString(), Toast.LENGTH_LONG).show();
         finish();
-
-//        Event newEvent = new Event(event);
-//        System.out.println("New event: " + newEvent);
+//        Z
     }
 
     public void openPrevious(View view){

@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -12,6 +13,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
@@ -24,6 +29,9 @@ import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.rey.material.widget.ProgressView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,8 +46,10 @@ public class EventDetailA extends Activity {
     private PieChart classChart;
     private LinearLayout friendView;
     private ArrayList<ParseUser> upvoteData = new ArrayList<>();
+    private ArrayList<ParseUser> friendsThatUpvoted = new ArrayList<>();
     private ParseRelation<ParseObject> eventRelation;
     private Dialog loadingDialog = null;
+    private ArrayList<String> facebookFriends = new ArrayList<>();
 
     private float[] genderNumbers = {0, 0, 0};
     private String[] genderNames = {"Male", "Female", "Unknown"};
@@ -57,7 +67,7 @@ public class EventDetailA extends Activity {
 
         event = (Event) getIntent().getSerializableExtra("event");
 
-        System.out.println(event);
+        loadFriends();
 
         TextView title = (TextView) findViewById(R.id.event_detail_title);
         TextView host = (TextView) findViewById(R.id.event_detail_host);
@@ -140,7 +150,7 @@ public class EventDetailA extends Activity {
                     try {
                         if (list.isEmpty()) {
                             ParseUser currentUser = ParseUser.getCurrentUser();
-                            EventDetailA.this.upvoteData.add(currentUser);
+                            //EventDetailA.this.upvoteData.add(currentUser);
                             System.out.println("The upvote list is empty");
                         }
                         for (ParseObject user : list) {
@@ -154,7 +164,7 @@ public class EventDetailA extends Activity {
                         // Start step 4
                         getGenderBreakdown();
                         getClassBreakdown();
-
+                        loadFriendsThatHyped();
                         loadFacebookFriends();
                     }
                 }
@@ -354,9 +364,9 @@ public class EventDetailA extends Activity {
         TextView numFriends = (TextView) findViewById(R.id.event_detail_number_friends);
         String message = " friends hyped this event";
 
-        numFriends.setText(String.valueOf(upvoteData.size()) + message);
+        numFriends.setText(String.valueOf(friendsThatUpvoted.size()) + message);
 
-        for(ParseUser user : upvoteData) {
+        for(ParseUser user : friendsThatUpvoted) {
             FacebookFriendsView newFriend = new FacebookFriendsView(this, user);
             try {
                 if(!user.getString("first_name").equals(""))
@@ -387,6 +397,45 @@ public class EventDetailA extends Activity {
 
 
         return loadingDialog;
+    }
+
+    public void loadFriends() {
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "me/friends",
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+            /* handle the result */
+                        try {
+                            JSONArray friends = (JSONArray) response.getJSONObject().get("data");
+
+                            for(int i = 0; i < friends.length(); i++) {
+                                JSONObject friend = (JSONObject) friends.get(i);
+                                facebookFriends.add(friend.get("id").toString());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        Log.d("Friend graph request", "completed");
+                    }
+                }
+        ).executeAsync();
+    }
+
+    public void loadFriendsThatHyped() {
+        friendsThatUpvoted.clear();
+        for(ParseUser voter : upvoteData) {
+            String fbId = voter.getString("fbID");
+            System.out.println(facebookFriends);
+            for(String friendId: facebookFriends) {
+                Log.d("Friend ID:", friendId);
+                if(fbId.equals(friendId))
+                    friendsThatUpvoted.add(voter);
+            }
+        }
     }
 
 }

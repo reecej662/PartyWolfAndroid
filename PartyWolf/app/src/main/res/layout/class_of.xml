@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:src="@drawable/login_bg"
+        android:scaleType="fitXY"/>
+
+    <TextView
+        android:id="@+id/whichClass"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Which class?"
+        android:textSize="35sp"
+        android:textColor="#ffffff"
+        android:gravity="center"
+        android:layout_marginTop="150dp"/>
+
+    <TextView
+        android:id="@+id/disclaimer"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Please note you will not be able to change this"
+        android:textSize="15sp"
+        android:textColor="#ffffff"
+        android:gravity="center"
+        android:layout_below="@id/whichClass"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/classOf"
+        android:layout_width="125dp"
+        android:layout_height="50dp"
+        android:text="class of"
+        android:layout_below="@id/disclaimer"
+        android:textSize="25sp"
+        android:textColor="#ffffff"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"/>
+
+    <Spinner
+        android:id="@+id/iAmPrompt"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:entries="@array/classof"
+        android:textColor="#ffffff"
+        android:prompt="@string/iAmPrompt"
+        android:layout_below="@id/disclaimer"
+        android:layout_marginTop="50dp"
+        android:layout_toLeftOf="@id/classOf"
+        android:gravity="center"
+        />
+
+    <Spinner
+        android:id="@+id/classNumber"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:entries="@array/classnumber"
+        android:layout_below="@id/disclaimer"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/classOf"
+        android:gravity="center"
+        />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Continue"
+        android:textSize="25sp"
+        android:layout_below="@id/classOf"
+        android:layout_marginTop="150dp"
+        android:textColor="#ffffff"
+        android:gravity="center"
+        style="?android:attr/borderlessButtonStyle"
+        android:onClick="continueButton"/>
+
+
+
+</RelativeLayout>
