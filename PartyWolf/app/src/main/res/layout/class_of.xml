@@ -31,49 +31,57 @@
         android:layout_below="@id/whichClass"
         android:layout_marginTop="10dp"/>
 
-    <TextView
-        android:id="@+id/classOf"
-        android:layout_width="125dp"
-        android:layout_height="50dp"
-        android:text="class of"
-        android:layout_below="@id/disclaimer"
-        android:textSize="25sp"
-        android:textColor="#ffffff"
-        android:layout_marginTop="50dp"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"/>
 
-    <Spinner
-        android:id="@+id/iAmPrompt"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:entries="@array/classof"
-        android:textColor="#ffffff"
-        android:prompt="@string/iAmPrompt"
+    <RelativeLayout
+        android:id="@+id/spinnerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
         android:layout_below="@id/disclaimer"
-        android:layout_marginTop="50dp"
-        android:layout_toLeftOf="@id/classOf"
-        android:gravity="center"
-        />
+        android:orientation="horizontal"
+        android:layout_marginTop="40dp">
 
-    <Spinner
-        android:id="@+id/classNumber"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:entries="@array/classnumber"
-        android:layout_below="@id/disclaimer"
-        android:layout_marginTop="50dp"
-        android:layout_marginLeft="10dp"
-        android:layout_toRightOf="@id/classOf"
-        android:gravity="center"
-        />
+        <TextView
+            android:id="@+id/classOf"
+            android:layout_width="wrap_content"
+            android:layout_height="68dp"
+            android:text="class of"
+            android:textSize="27sp"
+            android:textColor="#ffffff"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            />
+
+        <Spinner
+            android:id="@+id/iAmPrompt"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:entries="@array/classof"
+            android:textColor="#ffffff"
+            android:prompt="@string/iAmPrompt"
+            android:layout_toLeftOf="@id/classOf"
+            android:gravity="right"
+            />
+
+        <Spinner
+            android:id="@+id/classNumber"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:entries="@array/classnumber"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/classOf"
+            android:gravity="center"
+            />
+
+    </RelativeLayout>
 
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Continue"
         android:textSize="25sp"
-        android:layout_below="@id/classOf"
+        android:layout_below="@id/spinnerLayout"
         android:layout_marginTop="150dp"
         android:textColor="#ffffff"
         android:gravity="center"

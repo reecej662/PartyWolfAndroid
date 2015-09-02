@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,11 +15,15 @@ import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+
+import java.util.List;
+import java.util.Locale;
 
 public class Settings extends Activity {
 
@@ -28,6 +35,8 @@ public class Settings extends Activity {
     private Integer onHype;
     private ParseUser currentUser = null;
     private ImageView profilePicture = null;
+    private Location userLocation = null;
+    private String userCity = null;
 
     NumberPicker noPicker = null;
 
@@ -35,12 +44,19 @@ public class Settings extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        currentUser = ParseUser.getCurrentUser();
+
+        userLocation = (Location) getIntent().getExtras().get("location");
+        System.out.println(userLocation);
+
+        userCity = getCity(userLocation);
+
         noPicker = (NumberPicker) findViewById(R.id.on_number);
         noPicker.setMaxValue(100);
         noPicker.setMinValue(0);
         noPicker.setWrapSelectorWheel(false);
         noPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-        currentUser = ParseUser.getCurrentUser();
         userId = currentUser.getObjectId();
 
         Button doneButton = (Button) findViewById(R.id.doneButton);
@@ -50,6 +66,7 @@ public class Settings extends Activity {
                 finish();
             }
         });
+        currentUser.saveInBackground();
     }
 
     protected void onStart(){
@@ -153,13 +170,19 @@ public class Settings extends Activity {
         }
 
         TextView location = (TextView) findViewById(R.id.userLocation);
-        TextView school = (TextView) findViewById(R.id.schoolName);
+        final TextView school = (TextView) findViewById(R.id.schoolName);
         TextView classYear = (TextView) findViewById(R.id.userClass);
 
-        ParseObject universityPointer = (ParseObject) currentUser.get("university");
+        final ParseObject universityPointer = (ParseObject) currentUser.get("university");
 
-        location.setText(currentUser.getString("currentCity"));
-        school.setText(universityPointer.getString("name"));
+        universityPointer.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                school.setText(universityPointer.getString("name"));
+            }
+        });
+
+        location.setText(userCity);
         classYear.setText("Class of " + currentUser.getNumber("classOf").toString()) ;
 
         // Set the name
@@ -205,6 +228,34 @@ public class Settings extends Activity {
         ParseUser.logOut();
         Intent intent = new Intent(this, LoginA.class);
         startActivity(intent);
+    }
+
+    public String getCity(Location userLocation) {
+        double lat = userLocation.getLatitude();
+        double lng = userLocation.getLongitude();
+
+        try {
+            userCity = currentUser.getString("currentCity");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (userCity == null) {
+            Geocoder geoCoder = new Geocoder(Settings.this, Locale.getDefault());
+            try {
+                List<Address> address = geoCoder.getFromLocation(lat, lng, 1);
+                String city = address.get(0).getLocality() + ", " + address.get(0).getAdminArea();
+
+                currentUser.put("currentCity", city);
+                userCity = city;
+                System.out.println("I'm doing this");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return userCity;
     }
 
     /*https://parse.com/questions/updating-a-field-without-retrieving-the-object-first

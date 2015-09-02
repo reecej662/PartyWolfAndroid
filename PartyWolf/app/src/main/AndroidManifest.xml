@@ -42,7 +42,7 @@
         <activity android:name=".EventDetailA"/>
         <activity android:name=".EventDetailLoadingA"/>
 
-        <activity
+        <!--<activity
             android:name=".Login"
             android:label="@string/app_name" >
             <intent-filter>
@@ -50,7 +50,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity>-->
         <activity
             android:name=".Learn_More"
             android:label="@string/title_activity_learn__more" >

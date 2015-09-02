@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/dialog_background2"
+    >
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="fill_parent"
+        android:layout_height="65dp"
+        android:weightSum="2"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/okButton"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="Ok"
+            android:textColor="#fff"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/reenterButton"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="Re-enter"
+            android:textColor="#fff"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/buttons">
+
+        <ImageView
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:src="@drawable/email"
+            android:scaleType="fitXY"
+            android:layout_above="@id/title"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            />
+
+        <TextView
+            android:id="@+id/centerText"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Confirm your email! If you are having problems confirming it please send us an email (partywolfapp@gmail.com)"
+            android:textColor="#ffffff"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="30dp"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Can you do us a favor?"
+            android:textSize="25sp"
+            android:textColor="#fff"
+            android:gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@id/centerText"
+            android:layout_marginBottom="10dp"
+            />
+
+    </RelativeLayout>
+
+</RelativeLayout>

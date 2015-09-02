@@ -149,8 +149,6 @@ public class EventDetailA extends Activity {
                 public void done(List<ParseObject> list, ParseException e) {
                     try {
                         if (list.isEmpty()) {
-                            ParseUser currentUser = ParseUser.getCurrentUser();
-                            //EventDetailA.this.upvoteData.add(currentUser);
                             System.out.println("The upvote list is empty");
                         }
                         for (ParseObject user : list) {

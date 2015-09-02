@@ -1,17 +1,23 @@
 package com.aolalabs.partywolf;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 
@@ -24,15 +30,22 @@ import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -57,6 +70,8 @@ public class LoginA extends Activity implements OnClickListener {
         //Parse.initialize(this, "8IiZUWr2nVlthlX1VVrq3gDHXMfuhefW3EIbBdzE", "TNc5sg3go9lqQBcdizIZvgwa3wmXrDPo0D7txBTT");
         //ParseFacebookUtils.initialize(this);
         //ParseUser.enableRevocableSessionInBackground();
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         Button learnMoreButton = (Button) findViewById(R.id.learnMoreButton);
         ImageButton fbLoginButton = (ImageButton) findViewById(R.id.fbLoginButton);
@@ -143,8 +158,13 @@ public class LoginA extends Activity implements OnClickListener {
                     } catch (Exception ex) {
                         System.err.println(ex);
                     } finally {
-                        Intent i = new Intent(LoginA.this, PostTableA.class);
-                        startActivity(i);
+                        Boolean emailConfirmed = ParseUser.getCurrentUser().getBoolean("emailVerified");
+                        if(emailConfirmed) {
+                            Intent i = new Intent(LoginA.this, PostTableA.class);
+                            startActivity(i);
+                        } else {
+                            showConfirmEmailDialog(LoginA.this).show();
+                        }
                     }
                 }
             }
@@ -243,41 +263,21 @@ public class LoginA extends Activity implements OnClickListener {
                         String facebookProfileUrlLarge = "http://graph.facebook.com/"+fbID+"/picture?type=large";
                         String facebookProfileUrlThumb = "http://graph.facebook.com/"+fbID+"/picture?type=small";
 
+                        System.out.println(facebookProfileUrlLarge);
+
                         String[] pics = {facebookProfileUrlLarge};
-
-                        for(String pic : pics) {
-
-                            try {
-
-                                URL url = new URL(pic);
-                                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-                                InputStream is = connection.getInputStream();
-                                Bitmap img = BitmapFactory.decodeStream(is);
-
-                                if(pic.equals(pics[0])) {
-                                    currentUser.put("profile_pic", img);
-                                } else {
-                                    currentUser.put("profile_thumb", img);
-                                }
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-
-                        }
+                        String pic = pics[0];
+                        URL url = null;
 
                         try {
-                            currentUser.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-
-                                }
-                            });
-                        } catch (Exception e) {
+                            url = new URL(pic);
+                        } catch (MalformedURLException e) {
                             e.printStackTrace();
                         }
 
+                        new FetchProfilePic().doInBackground(url);
+
+                        ParseUser.getCurrentUser().saveInBackground();
                     }
                 });
 
@@ -291,7 +291,7 @@ public class LoginA extends Activity implements OnClickListener {
 
     public void userLoggedIn(AccessToken token) {
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        currentUser = ParseUser.getCurrentUser();
 
         GraphRequest request = GraphRequest.newMeRequest(
                 token,
@@ -300,7 +300,6 @@ public class LoginA extends Activity implements OnClickListener {
                     public void onCompleted(JSONObject user, GraphResponse response) {
 
                         System.out.println(user);
-                        ParseUser currentUser = ParseUser.getCurrentUser();
                         currentUser.fetchInBackground();
 
                         System.out.println(currentUser);
@@ -348,6 +347,7 @@ public class LoginA extends Activity implements OnClickListener {
                             currentUser.put("onStatus", true);
                             currentUser.put("onNew", true);
                             currentUser.put("onHype", -1);
+                            currentUser.put("classOf", 2018);
 
                         } catch (Exception e) {
                             System.err.println(e);
@@ -355,36 +355,24 @@ public class LoginA extends Activity implements OnClickListener {
 
                         // Get profile picture
 
+                        ParseUser.getCurrentUser().saveInBackground();
+
                         String facebookProfileUrlLarge = "http://graph.facebook.com/"+fbID+"/picture?type=large";
                         String facebookProfileUrlThumb = "http://graph.facebook.com/"+fbID+"/picture?type=small";
 
                         System.out.println(facebookProfileUrlLarge);
 
                         String[] pics = {facebookProfileUrlLarge};
+                        String pic = pics[0];
+                        URL url = null;
 
-                        for(String pic : pics) {
-
-                            try {
-
-                                URL url = new URL(pic);
-                                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-                                InputStream is = connection.getInputStream();
-                                Bitmap img = BitmapFactory.decodeStream(is);
-
-                                if(pic.equals(pics[0])) {
-                                    currentUser.put("profile_pic", img);
-                                } else {
-                                    currentUser.put("profile_thumb", img);
-                                }
-
-                            } catch (Exception e) {
-                                System.err.println(e);
-                            }
-
+                        try {
+                            url = new URL(pic);
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
                         }
 
-                        ParseUser.getCurrentUser().saveInBackground();
+                        new FetchProfilePic().doInBackground(url);
 
                     }
                 });
@@ -482,5 +470,84 @@ public class LoginA extends Activity implements OnClickListener {
             // confirmEmailAlert();
         }
     }
+
+    private class FetchProfilePic extends AsyncTask<URL, Void, Void> {
+
+        @Override
+        protected Void doInBackground(URL... urls) {
+
+            HttpClient client = new DefaultHttpClient();
+            HttpGet request = new HttpGet(urls[0].toString());
+            HttpResponse response;
+            Bitmap img;
+
+            try {
+
+               // Bitmap img = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+
+                response = (HttpResponse)client.execute(request);
+                HttpEntity entity = response.getEntity();
+                BufferedHttpEntity bufferedEntity = new BufferedHttpEntity(entity);
+                InputStream inputStream = bufferedEntity.getContent();
+                img = BitmapFactory.decodeStream(inputStream);
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                stream.reset();
+
+                img.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                byte[] image = stream.toByteArray();
+                System.out.println(image);
+
+                // Create the ParseFile
+                ParseFile file = new ParseFile("file", image);
+                // Upload the image into Parse Cloud
+                file.saveInBackground();
+
+                currentUser.put("profile_pic", file);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+    }
+
+    public Dialog showConfirmEmailDialog(Context context) {
+        System.out.println("We're getting here");
+
+        final Dialog loadingDialog = new Dialog(context);
+        loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        loadingDialog.setContentView(R.layout.confirm_email_dialog);
+
+        final Window window = loadingDialog.getWindow();
+        window.setLayout(600, 700);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        Button okButton = (Button) loadingDialog.findViewById(R.id.okButton);
+        Button reenterButton = (Button) loadingDialog.findViewById(R.id.reenterButton);
+
+        okButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingDialog.dismiss();
+            }
+        });
+
+        reenterButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingDialog.dismiss();
+                Intent i = new Intent (LoginA.this, AddEmailA.class);
+                startActivity(i);
+            }
+        });
+
+        return loadingDialog;
+    }
+
 
 }

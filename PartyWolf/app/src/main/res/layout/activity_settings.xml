@@ -85,7 +85,7 @@
                 <ImageView
                     android:layout_width="140dp"
                     android:layout_height="match_parent"
-                    android:src="@drawable/logo"
+                    android:src="@drawable/default_prof"
                     android:background="#666666"
                     android:id="@+id/userProfilePic"
                     android:layout_marginRight="10dp"

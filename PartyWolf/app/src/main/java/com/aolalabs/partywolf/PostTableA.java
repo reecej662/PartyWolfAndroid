@@ -92,7 +92,11 @@ public class PostTableA extends Activity implements OnClickListener{
             currentUser = ParseUser.getCurrentUser();
             Log.d("Curent user", currentUser.toString());
             if(currentUser == null) {
+                finish();
                 startActivity(login);
+            } else if(currentUser.getNumber("classOf") == null) {
+                Intent i = new Intent(PostTableA.this, ClassOfA.class);
+                startActivity(i);
             } else {
                 currentUser.fetchInBackground();
                 getLocation();
@@ -114,6 +118,7 @@ public class PostTableA extends Activity implements OnClickListener{
                 firstLoad = false;
                 registerClickCallback();
                 loadingDialog.dismiss();
+                populateListView(dataManager.events);
                 //pullToRefresh.setRefreshing(false);
             }
         });
@@ -402,6 +407,10 @@ public class PostTableA extends Activity implements OnClickListener{
                 break;
             case R.id.settingsButton:
                 i = new Intent(this, Settings.class);
+                if(userLocation == null) {
+                    userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                }
+                i.putExtra("location", userLocation);
                 startActivity(i);
                 break;
             default:
@@ -445,7 +454,7 @@ public class PostTableA extends Activity implements OnClickListener{
                 Geocoder geoCoder = new Geocoder(PostTableA.this, Locale.getDefault());
                 try {
                     List<Address> address = geoCoder.getFromLocation(lat, lng, 1);
-                    String city = address.get(0).getLocality();
+                    String city = address.get(0).getLocality() + ", " + address.get(0).getAdminArea();
 
                     currentUser.put("currentCity", city);
 

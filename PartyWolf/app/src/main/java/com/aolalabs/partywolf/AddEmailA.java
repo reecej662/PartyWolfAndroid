@@ -1,12 +1,16 @@
 package com.aolalabs.partywolf;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -72,14 +76,7 @@ public class AddEmailA extends Activity {
                     connectPack();
                 } catch (Exception e) {
                     e.printStackTrace();
-                } finally {
-                    currentUser.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            Intent i = new Intent(AddEmailA.this, PostTableA.class);
-                            startActivity(i);
-                        }
-                    });
+                    System.err.println("Error connecting university");
                 }
             }
         } else {
@@ -102,13 +99,48 @@ public class AddEmailA extends Activity {
                     ParseObject realUniversity = list.get(0);
                     currentUser.put("university", realUniversity);
                     currentUser.put("pack", realUniversity.get("name"));
+
+                    currentUser.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            showConfirmEmailDialog(AddEmailA.this).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(AddEmailA.this, "Sorry your university doesn't have PartyWolf yet", Toast.LENGTH_LONG).show();
                 }
+
             }
         });
     }
 
     public void back(View v) {
         finish();
+    }
+
+    public Dialog showConfirmEmailDialog(Context context) {
+        System.out.println("We're getting here");
+
+        final Dialog loadingDialog = new Dialog(context);
+        loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        loadingDialog.setContentView(R.layout.enter_email_dialog);
+
+        final Window window = loadingDialog.getWindow();
+        window.setLayout(600, 500);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        Button soundsGoodButton = (Button) loadingDialog.findViewById(R.id.soundsGoodButton);
+
+        soundsGoodButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingDialog.dismiss();
+                finish();
+            }
+        });
+
+        return loadingDialog;
     }
 
 
