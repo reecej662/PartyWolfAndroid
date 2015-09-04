@@ -64,12 +64,7 @@ public class LoginA extends Activity implements OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //FacebookSdk.sdkInitialize(this);
         setContentView(R.layout.activity_login);
-        //Parse.enableLocalDatastore(this);
-        //Parse.initialize(this, "8IiZUWr2nVlthlX1VVrq3gDHXMfuhefW3EIbBdzE", "TNc5sg3go9lqQBcdizIZvgwa3wmXrDPo0D7txBTT");
-        //ParseFacebookUtils.initialize(this);
-        //ParseUser.enableRevocableSessionInBackground();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -109,14 +104,10 @@ public class LoginA extends Activity implements OnClickListener {
     public void onClick(View v) {
         switch(v.getId()) {
             case R.id.learnMoreButton:
-                System.out.println("They wanna learn more!11!!1");
                 LoginManager.getInstance().logOut();
-                //System.out.println(AccessToken.getCurrentAccessToken().getPermissions());
                 break;
             case R.id.fbLoginButton:
-                System.out.println("Log in button pressed");
                 logInFacebook();
-                //System.out.println(LoginManager.getInstance().a);
                 break;
 
         }
@@ -130,9 +121,6 @@ public class LoginA extends Activity implements OnClickListener {
     }
 
     public void logInFacebook() {
-        //login
-
-        //final AccessToken myToken = token;
 
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
             @Override
@@ -170,28 +158,6 @@ public class LoginA extends Activity implements OnClickListener {
             }
         });
 
-        //String fbID = "";
-//
-//        try {
-//            wait(1000);
-//        } catch (Exception e) {
-//            System.err.println(e);
-//        }
-
-        /*try {
-            fbID = currentUser.getString("fbID");
-            if(!fbID.equals("")) {
-                System.out.println(fbID);
-                System.out.println(AccessToken.getCurrentAccessToken().getPermissions().toString());
-                userLoggedIn(AccessToken.getCurrentAccessToken());
-            } else {
-                newUserSignUp();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            newUserSignUp();
-        }*/
-
     }
 
     private void newUserSignUp() {
@@ -210,7 +176,6 @@ public class LoginA extends Activity implements OnClickListener {
                         }
 
                         System.out.println(currentUser);
-                        //System.out.println("Parse user: " + currentUser.getString("first_name"));
 
                         String fbID = "";
 
@@ -482,9 +447,6 @@ public class LoginA extends Activity implements OnClickListener {
             Bitmap img;
 
             try {
-
-               // Bitmap img = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
-
                 response = (HttpResponse)client.execute(request);
                 HttpEntity entity = response.getEntity();
                 BufferedHttpEntity bufferedEntity = new BufferedHttpEntity(entity);

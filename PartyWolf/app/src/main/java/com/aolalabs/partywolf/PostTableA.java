@@ -78,6 +78,7 @@ public class PostTableA extends Activity implements OnClickListener{
     private LocationManager locationManager;
     private Location userLocation = null;
     private boolean firstLoad = true;
+    private ArrayAdapter<Event> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstance) {
@@ -87,6 +88,8 @@ public class PostTableA extends Activity implements OnClickListener{
 
         // Go to login screen if no user not currently logged in
         Intent login = new Intent(this, LoginA.class);
+
+        currentUser = ParseUser.getCurrentUser();
 
         try{
             currentUser = ParseUser.getCurrentUser();
@@ -115,11 +118,21 @@ public class PostTableA extends Activity implements OnClickListener{
                 Log.d("dataManager", "Data loaded");
                 if(firstLoad)
                     populateListView(dataManager.events);
+                else{
+                    //Figure out a way to add new events to listview
+                    //until then....
+                    if(adapter.getClass().equals(MyListAdapter.class)) {
+                        MyListAdapter tmpAdapter = (MyListAdapter) adapter;
+                        if(!tmpAdapter.getEvents().equals(dataManager.getEvents())) {
+                            populateListView(dataManager.getEvents());
+                        }
+                    }
+
+                }
                 firstLoad = false;
                 registerClickCallback();
                 loadingDialog.dismiss();
-                populateListView(dataManager.events);
-                //pullToRefresh.setRefreshing(false);
+
             }
         });
 
@@ -198,7 +211,7 @@ public class PostTableA extends Activity implements OnClickListener{
 
     private void populateListView(ArrayList<Event> events) {
         // Build Adapter
-        ArrayAdapter<Event> adapter = new MyListAdapter(events);
+        adapter = new MyListAdapter(events);
 
         // Configure the list view
         ListView list = (ListView) findViewById(R.id.main_list_view);
@@ -211,7 +224,6 @@ public class PostTableA extends Activity implements OnClickListener{
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-                System.out.println(viewClicked.getId());
                 Event clickedEvent;
                 if (dateView) {
                     clickedEvent = dataManager.getEventAtIndex(position);
@@ -227,6 +239,10 @@ public class PostTableA extends Activity implements OnClickListener{
 
     private class MyListAdapter extends ArrayAdapter<Event> {
         private ArrayList<Event> events;
+
+        public ArrayList<Event> getEvents() {
+            return events;
+        }
 
         public MyListAdapter(ArrayList<Event> listEvents) {
             super(PostTableA.this, R.layout.swipe_event, listEvents);
@@ -307,7 +323,6 @@ public class PostTableA extends Activity implements OnClickListener{
             final OnClickListener clickListener = new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    System.out.println(v.getId());
                     Event clickedEvent;
                     if (dateView) {
                         clickedEvent = events.get(elementPosition);
@@ -457,6 +472,7 @@ public class PostTableA extends Activity implements OnClickListener{
                     String city = address.get(0).getLocality() + ", " + address.get(0).getAdminArea();
 
                     currentUser.put("currentCity", city);
+                    currentUser.saveInBackground();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -491,7 +507,6 @@ public class PostTableA extends Activity implements OnClickListener{
         headerView.setBackgroundResource(R.color.colorPrimary);
 
         newHeader.setDropHeight(200);
-        //newHeader.setMinimumHeight(300);
 
         ImageView wolfSpinner = new ImageView(this);
         wolfSpinner.setBackgroundResource(R.drawable.wolf_spinner);
@@ -512,8 +527,6 @@ public class PostTableA extends Activity implements OnClickListener{
         wolf.setX(50);
         glasses.setX(getWindowManager().getDefaultDisplay().getWidth() - 260);
 
-        //newHeader.addView(wolfSpinner);
-        //newHeader.add
         newHeader.setPadding(0, 25, 0, 25);
         newHeader.setBackgroundColor(Color.argb(0, 255, 255, 255));
 
@@ -531,13 +544,11 @@ public class PostTableA extends Activity implements OnClickListener{
                 } else if (value > 200){
                     alpha = 200 - value;
                 }
-                System.out.println("Alpha: " + alpha);
 
                 newHeader.setBackgroundColor(Color.argb(alpha, 0, 169, 255));
             }
 
         });
-        //colorAnimation.setDuration(500);
 
         newHeader.initWithString("Work dammit");
         headerView.addView(glassesSpinner);
@@ -560,11 +571,18 @@ public class PostTableA extends Activity implements OnClickListener{
         });
 
         pullToRefresh.addPtrUIHandler(new PtrUIHandler() {
+            float prevYOffset = 0;
+            float wolfInitialX = 50;
+            float glassesInitialX = getWindowManager().getDefaultDisplay().getWidth() - 260;
+            float wolfMaxOffset = (getWindowManager().getDefaultDisplay().getWidth() - wolf.getLayoutParams().width)/2;
+            float glassesMaxOffset = (getWindowManager().getDefaultDisplay().getWidth() - glasses.getLayoutParams().width)/2;
+
             @Override
             public void onUIReset(PtrFrameLayout frameLayout) {
+                prevYOffset = 0;
                 newHeader.setBackgroundColor(Color.argb(0, 255, 255, 255));
-                wolf.setX(50);
-                glasses.setX(getWindowManager().getDefaultDisplay().getWidth() - 260);
+                wolf.setX(wolfInitialX);
+                glasses.setX(glassesInitialX);
             }
 
             @Override
@@ -576,6 +594,8 @@ public class PostTableA extends Activity implements OnClickListener{
             @Override
             public void onUIRefreshBegin(PtrFrameLayout frameLayout) {
                 colorAnimation.start();
+                wolf.setX(wolfMaxOffset);
+                glasses.setX(glassesMaxOffset);
             }
 
             @Override
@@ -585,17 +605,43 @@ public class PostTableA extends Activity implements OnClickListener{
 
             @Override
             public void onUIPositionChange(PtrFrameLayout frameLayout, boolean b, byte b1, PtrIndicator ptrIndicator) {
-                //System.out.println(eventList.getY());
                 float yOffSet = eventList.getY();
 
+                if(prevYOffset > yOffSet) {
+                    yOffSet = -yOffSet;
+                } else {
+                    prevYOffset = yOffSet;
+                }
+
+                if(wolf.getX() == wolfMaxOffset && glasses.getX() == glassesMaxOffset) {
+                    yOffSet = 0;
+                }
+
+                System.out.println(yOffSet);
 
                 float wolfX = wolf.getX() + yOffSet/12;
                 float glassesX = glasses.getX() - yOffSet/12;
-                float wolfMaxOffset = (getWindowManager().getDefaultDisplay().getWidth() - wolf.getLayoutParams().width)/2;
-                float glassesMaxOffset = (getWindowManager().getDefaultDisplay().getWidth() - glasses.getLayoutParams().width)/2;
 
-                wolf.setX(min(wolfX, wolfMaxOffset));
-                glasses.setX(max(glassesX, glassesMaxOffset));
+                wolf.setX(max(min(wolfX, wolfMaxOffset), wolfInitialX));
+                glasses.setX(min(max(glassesX, glassesMaxOffset), glassesInitialX));
+            }
+
+            public ValueAnimator animateView(final View v) {
+                float maxOffset = v.equals(wolf) ? wolfMaxOffset : glassesMaxOffset;
+
+                ValueAnimator animator = ValueAnimator.ofFloat(v.getX(), maxOffset);
+                animator.setDuration(500);
+                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animator) {
+                        System.out.println(animator.getAnimatedValue());
+                        v.setX(animator.getAnimatedFraction());
+                    }
+
+                });
+
+                return animator;
             }
         });
 

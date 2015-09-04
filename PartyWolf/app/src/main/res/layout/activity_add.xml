@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/GrayBackground" >
+    android:background="@color/GrayBackground"
+    android:fitsSystemWindows="true">
 
     <RelativeLayout
         android:id="@+id/topBar"
@@ -59,7 +60,7 @@
         android:background="#ffffff"
         android:layout_below="@id/topBar">
 
-        <EditText
+        <com.aolalabs.partywolf.CustomEditText
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:hint="@string/event_name_title"
@@ -69,26 +70,32 @@
             android:singleLine="true"
             android:nextFocusDown="@+id/event_description"/>
 
-        <EditText
+        <com.aolalabs.partywolf.CustomEditText
             android:layout_width="match_parent"
-            android:layout_height="270dp"
+            android:layout_height="320dp"
             android:hint="@string/event_description"
             android:id="@+id/event_description"
             android:textColorHint="#d3d3d3"
             android:textColor="@color/Black"
             android:gravity="top"
-            android:singleLine="true"
+            android:singleLine="false"
             android:nextFocusDown="@+id/horizontal_layout"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:id="@+id/bottom_container">
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="50dp"
             android:orientation="horizontal"
             android:layout_gravity="center_vertical"
-            android:id="@+id/horizontal_layout"
+            android:id="@+id/detail_container1"
             android:nextFocusRight="@+id/fee">
 
-            <EditText
+            <com.aolalabs.partywolf.CustomEditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/fee"
@@ -127,12 +134,14 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="50dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:id="@+id/detail_container2">
 
-            <EditText
+            <com.aolalabs.partywolf.CustomEditText
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:hint="@string/one_emoji"
+                android:inputType="textShortMessage"
                 android:id="@+id/one_emoji"
                 android:textColorHint="#d3d3d3"
                 android:textColor="@color/Black"
@@ -140,7 +149,7 @@
                 android:singleLine="true"
                 android:nextFocusDown="@+id/presented_by"/>
 
-            <EditText
+            <com.aolalabs.partywolf.CustomEditText
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:hint="@string/presented_by"
@@ -155,12 +164,13 @@
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="50dp">
+            android:layout_height="fill_parent"
+            android:id="@+id/date">
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:hint="Tap below to enter the date"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:hint="Tap to enter the date"
                 android:id="@+id/date_text"
                 android:textColorHint="#d3d3d3"
                 android:textSize="18sp"
@@ -169,13 +179,14 @@
                 android:textColor="@color/Black"
                 android:layout_weight="2"
                 android:singleLine="true"
-                android:onClick="setDate"
-                android:visibility="visible"
-                android:nextFocusDown="@+id/new_date"/>
+                android:onClick="setDate:"
+                android:visibility="visible"/>
 
         </LinearLayout>
 
-        <Button
+        </LinearLayout>
+
+        <!--<Button
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:text="@string/new_date"
@@ -183,7 +194,7 @@
             android:id="@+id/new_date"
             android:background="#73e773"
             style="@style/add_button_text_white"
-            android:onClick="setDate"/>
+            android:onClick="setDate"/>-->
 
     </LinearLayout>
 

@@ -129,12 +129,10 @@ public class PostDataManager {
                 try {
                     if (e == null) {
                         for (ParseObject object : postList) {
-                            if((eventInArea(object) && !object.getBoolean("onCampus"))
-                                   || (currentUser.get("university").equals(object.get("university")))) {
+                            if((eventInArea(object) && !object.getBoolean("onCampus")) || (currentUser.get("university").equals(object.get("university")))) {
                                 events.add(new Event(object));
                                 parseEvents.add(object);
-                            } else {
-                                System.out.println("Event not in local area");
+                                System.out.println(object.getString("title"));
                             }
                         }
                     } else {
@@ -305,7 +303,7 @@ public class PostDataManager {
     }
 
     public interface DataListener {
-        public void onDataLoaded();
+        void onDataLoaded();
     }
 
     public void setDataListener(DataListener listener) {
@@ -315,19 +313,18 @@ public class PostDataManager {
     public boolean eventInArea(ParseObject object) {
 
         ParseGeoPoint eventLocation = object.getParseGeoPoint("postLocation");
-        try {
+
+        /*try {
             System.out.println("Latitude: " + this.userLocation.getLatitude() + " Longitude: " + this.userLocation.getLongitude());
         } catch (Exception e) {
             System.out.println("Location was null");
-        }
+        }*/
 
         ParseGeoPoint userLocation = new ParseGeoPoint(this.userLocation.getLatitude(), this.userLocation.getLongitude());
 
         Double distance = eventLocation.distanceInMilesTo(userLocation);
-        System.out.println(this.userLocation);
-        System.out.println(distance);
 
-        if (distance < 10) {
+        if (distance < 20) {
             return (true);
         } else {
             return (false);

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:isScrollContainer="true"
+    android:id="@+id/rootView"
+    >
+
+        <Button
+            android:id="@+id/text1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Text 1"
+            android:gravity="center"
+            android:textSize="30sp"
+            android:onClick="testButton"
+            android:layout_alignParentTop="true"/>
+
+        <com.aolalabs.partywolf.CustomEditText
+            android:id="@+id/text2"
+            android:layout_width="match_parent"
+            android:layout_height="450dp"
+            android:gravity="center"
+            android:textSize="30sp"
+            android:layout_below="@id/text1"
+            android:hint="Text 2" />
+
+        <EditText
+            android:id="@+id/text3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="Text 3"
+            android:gravity="center"
+            android:textSize="30sp"
+            android:layout_below="@id/text2"
+            android:onClick="testButton"/>
+
+
+</RelativeLayout>

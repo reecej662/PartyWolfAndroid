@@ -172,6 +172,7 @@ public class Settings extends Activity {
         TextView location = (TextView) findViewById(R.id.userLocation);
         final TextView school = (TextView) findViewById(R.id.schoolName);
         TextView classYear = (TextView) findViewById(R.id.userClass);
+        TextView name = (TextView) findViewById(R.id.username);
 
         final ParseObject universityPointer = (ParseObject) currentUser.get("university");
 
@@ -186,7 +187,7 @@ public class Settings extends Activity {
         classYear.setText("Class of " + currentUser.getNumber("classOf").toString()) ;
 
         // Set the name
-        //name.setText(friend.getString("first_name"));
+        name.setText(currentUser.getString("first_name") + " " + currentUser.getString("last_name"));
     }
 
     public void openHype(View view){

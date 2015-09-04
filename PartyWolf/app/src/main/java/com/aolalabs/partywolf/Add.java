@@ -7,8 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.view.ViewGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,15 +26,18 @@ import java.util.Date;
 
 public class Add extends FragmentActivity {
 
-    private EditText eventTitle;
-    private EditText eventDescription;
-    private EditText emoji;
-    private EditText host;
-    private EditText fee;
-    private LinearLayout horizontal_layout;
+    private CustomEditText eventTitle;
+    private CustomEditText eventDescription;
+    private CustomEditText emoji;
+    private CustomEditText host;
+    private CustomEditText fee;
 //    private int day,month,year, hour, minute;
     private Date eventDate;
     private ParseGeoPoint location;
+    private int bottomHeight = 0;
+    private int eventDescriptionHeight = 0;
+    private boolean keyboardActive = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,22 +45,30 @@ public class Add extends FragmentActivity {
         setContentView(R.layout.activity_add);
 
         Location userLocation = (Location) getIntent().getExtras().get("location");
-        System.out.println(userLocation);
 
         if(userLocation != null)
             location = new ParseGeoPoint(userLocation.getLatitude(), userLocation.getLongitude());
 
-        eventTitle = (EditText) findViewById(R.id.event_name_title);
-        eventDescription = (EditText) findViewById(R.id.event_description);
-        emoji = (EditText) findViewById(R.id.one_emoji);
-        host = (EditText) findViewById(R.id.presented_by);
-        fee = (EditText) findViewById(R.id.fee);
-        horizontal_layout = (LinearLayout) findViewById(R.id.horizontal_layout);
-    }
+        eventTitle = (CustomEditText) findViewById(R.id.event_name_title);
+        eventDescription = (CustomEditText) findViewById(R.id.event_description);
+        emoji = (CustomEditText) findViewById(R.id.one_emoji);
+        host = (CustomEditText) findViewById(R.id.presented_by);
+        fee = (CustomEditText) findViewById(R.id.fee);
+        TextView dateText = (TextView) findViewById(R.id.date_text);
+        dateText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setDate(v);
+            }
+        });
 
+        setLayoutParameters();
+        setListeners();
+    }
 
     public void setDate (View view){
         final SimpleDateFormat mFormatter = new SimpleDateFormat("EEEE MMMM dd, h:mm aa");
+        keyboardClosed();
         SlideDateTimeListener listener = new SlideDateTimeListener() {
 
             @Override
@@ -75,8 +85,9 @@ public class Add extends FragmentActivity {
             @Override
             public void onDateTimeCancel()
             {
-                Toast.makeText(Add.this, "Canceled", Toast.LENGTH_SHORT).show();
+
             }
+
         };
 
         new SlideDateTimePicker.Builder(getSupportFragmentManager())
@@ -275,7 +286,87 @@ public class Add extends FragmentActivity {
 //        Z
     }
 
+    public void setListeners() {
+
+        //bottomHeight = 500;
+
+        View.OnFocusChangeListener listener = new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus && eventDescription.getLayoutParams().height == eventDescriptionHeight) {
+                    keyboardOpened();
+                } else if(!hasFocus){
+                    keyboardClosed();
+                }
+            }
+        };
+
+        CustomEditText.KeyboardCloseListener keyboardCloseListener = new CustomEditText.KeyboardCloseListener() {
+            @Override
+            public void onKeyboardClosed() {
+                keyboardClosed();
+            }
+        };
+
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!keyboardActive) {
+                    keyboardOpened();
+                }
+            }
+        };
+
+        eventTitle.setOnFocusChangeListener(listener);
+        eventDescription.setOnFocusChangeListener(listener);
+        emoji.setOnFocusChangeListener(listener);
+        host.setOnFocusChangeListener(listener);
+        fee.setOnFocusChangeListener(listener);
+
+        eventTitle.setBackListener(keyboardCloseListener);
+        eventDescription.setBackListener(keyboardCloseListener);
+        emoji.setBackListener(keyboardCloseListener);
+        host.setBackListener(keyboardCloseListener);
+        fee.setBackListener(keyboardCloseListener);
+
+        emoji.setOnClickListener(onClickListener);
+        host.setOnClickListener(onClickListener);
+
+    }
+
+    public void keyboardOpened() {
+        System.out.println("I'm supposed to be doing something...");
+        ViewGroup.LayoutParams eventDescriptionParams = eventDescription.getLayoutParams();
+        eventDescriptionParams.height -= bottomHeight;
+        System.out.println(bottomHeight);
+        eventDescription.setLayoutParams(eventDescriptionParams);
+        keyboardActive = true;
+    }
+
+    public void keyboardClosed() {
+        ViewGroup.LayoutParams eventDescriptionParams = eventDescription.getLayoutParams();
+        eventDescriptionParams.height = eventDescriptionHeight;
+        System.out.println(bottomHeight);
+        eventDescription.setLayoutParams(eventDescriptionParams);
+        keyboardActive = false;
+    }
+
+    public void setLayoutParameters() {
+        int windowHeight = getWindowManager().getDefaultDisplay().getHeight();
+        int topBarHeight = findViewById(R.id.topBar).getLayoutParams().height;
+        int eventNameTitleHeight = findViewById(R.id.event_name_title).getLayoutParams().height;
+        int event_descriptionHeight = findViewById(R.id.event_description).getLayoutParams().height;
+
+        eventDescriptionHeight = eventDescription.getLayoutParams().height;
+        bottomHeight = 176 + windowHeight - (topBarHeight+eventNameTitleHeight + event_descriptionHeight);
+
+        Log.d("Window height: ", ""+windowHeight);
+        Log.d("Bottom height: ", "" + bottomHeight);
+
+    }
+
     public void openPrevious(View view){
         finish();
     }
+
 }
