@@ -10,7 +10,7 @@
             android:id="@+id/text1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Text 1"
+            android:text="Reassign university"
             android:gravity="center"
             android:textSize="30sp"
             android:onClick="testButton"

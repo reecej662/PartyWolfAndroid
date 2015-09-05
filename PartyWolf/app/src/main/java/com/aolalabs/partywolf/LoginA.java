@@ -133,7 +133,7 @@ public class LoginA extends Activity implements OnClickListener {
                     try {
                         newUserSignUp();
                     } catch (Exception ex) {
-                        System.err.println(ex);
+                        ex.printStackTrace();
                     } finally {
                         System.out.println("Now login A user " + ParseUser.getCurrentUser());
                         Intent i = new Intent(LoginA.this, AddEmailA.class);
@@ -144,11 +144,12 @@ public class LoginA extends Activity implements OnClickListener {
                     try {
                         userLoggedIn(AccessToken.getCurrentAccessToken());
                     } catch (Exception ex) {
-                        System.err.println(ex);
+                        ex.printStackTrace();
                     } finally {
                         Boolean emailConfirmed = ParseUser.getCurrentUser().getBoolean("emailVerified");
                         if(emailConfirmed) {
                             Intent i = new Intent(LoginA.this, PostTableA.class);
+                            finish();
                             startActivity(i);
                         } else {
                             showConfirmEmailDialog(LoginA.this).show();
@@ -315,7 +316,7 @@ public class LoginA extends Activity implements OnClickListener {
                             currentUser.put("classOf", 2018);
 
                         } catch (Exception e) {
-                            System.err.println(e);
+                            e.printStackTrace();
                         }
 
                         // Get profile picture
@@ -360,13 +361,13 @@ public class LoginA extends Activity implements OnClickListener {
         try {
             isBanned = currentUser.getString("banned");
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
 
         try{
-            wolfPack = currentUser.getString("wolfPack");
+            wolfPack = currentUser.getString("pack");
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
 
         boolean isLeader = false;

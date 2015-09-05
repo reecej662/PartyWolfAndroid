@@ -7,51 +7,37 @@
             android:layout_height="fill_parent"
             android:orientation="vertical">
 
-            <LinearLayout
+            <RelativeLayout
+                android:id="@+id/topBar"
                 android:layout_width="fill_parent"
-                android:layout_height="35dp"
+                android:layout_height="50dp"
                 android:orientation="horizontal"
                 android:background="@color/ColorPrimary">
 
                 <Button
-                    android:layout_width="wrap_content"
+                    android:layout_width="70dp"
                     android:layout_height="fill_parent"
-                    android:textColor="@color/White"
                     android:text="Back"
-                    android:textSize="15dp"
-                    android:background="@null"
-                    android:onClick="openSettings"
-                    android:gravity="center_vertical"
-                    android:layout_marginLeft="10dp"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="fill_parent"
-                    android:layout_weight="1" />
+                    android:id="@+id/back"
+                    android:textSize="20sp"
+                    android:background="@android:color/transparent"
+                    style="@style/add_button_text_white"
+                    android:onClick="back" />
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Privacy"
-                    android:textColor="@color/White"
-                    android:textSize="20dp"
-                    android:background="@null"
-                    android:layout_gravity="center_vertical" />
-
-                <View
-                    android:layout_width="0dp"
                     android:layout_height="fill_parent"
-                    android:layout_weight="1" />
+                    android:id="@+id/new_post"
+                    android:text="Privacy Policy"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:paddingTop="11dp"
+                    android:background="@drawable/blue_blue_button"
+                    style="@style/new_post"
+                    android:textSize="24sp"
+                    android:paddingBottom="10dp" />
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:textColor="@color/ColorPrimary"
-                    android:text="Back"
-                    android:textSize="15dp"
-                    android:background="@null" />
-
-            </LinearLayout>
+            </RelativeLayout>
 
             <ScrollView
                 android:layout_width="match_parent"
@@ -61,6 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/privacy"
+                android:layout_marginTop="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"/>
 

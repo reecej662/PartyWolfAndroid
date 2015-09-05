@@ -34,6 +34,7 @@ public class Add extends FragmentActivity {
 //    private int day,month,year, hour, minute;
     private Date eventDate;
     private ParseGeoPoint location;
+    private TextView dateText;
     private int bottomHeight = 0;
     private int eventDescriptionHeight = 0;
     private boolean keyboardActive = false;
@@ -54,7 +55,7 @@ public class Add extends FragmentActivity {
         emoji = (CustomEditText) findViewById(R.id.one_emoji);
         host = (CustomEditText) findViewById(R.id.presented_by);
         fee = (CustomEditText) findViewById(R.id.fee);
-        TextView dateText = (TextView) findViewById(R.id.date_text);
+        dateText = (TextView) findViewById(R.id.date_text);
         dateText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,6 +65,11 @@ public class Add extends FragmentActivity {
 
         setLayoutParameters();
         setListeners();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     public void setDate (View view){
@@ -102,81 +108,10 @@ public class Add extends FragmentActivity {
 
 
     public void newPost (View view) {
-//        String newYear = String.valueOf(year);
-//        String newMonth = String.valueOf(month);
-//        String newDay = String.valueOf(day);
-//        String newHour = String.valueOf(hour);
-//        String newMinute = String.valueOf(minute);
-//
-//        StringBuilder dateAndTime = new StringBuilder(getResources().getString(R.string.empty));
-//
-//        //Inefficient form of changing numeric months to letters
-//        if (newMonth.equals(getResources().getString(R.string.one))) {
-//            String lastMonth = (String) getResources().getString(R.string.jan);
-//            dateAndTime.append(lastMonth);
-//        }
-//        if (newMonth.equals(getResources().getString(R.string.two))) {
-//            String lastMonth = (String) getResources().getString(R.string.feb);
-//            dateAndTime.append(lastMonth);
-//        }
-//        if (newMonth.equals(getResources().getString(R.string.three))) {
-//            String lastMonth = (String) getResources().getString(R.string.mar);
-//            dateAndTime.append(lastMonth);
-//        }
-//        if (newMonth.equals(getResources().getString(R.string.four))) {
-//            String lastMonth = (String) getResources().getString(R.string.apr);
-//            dateAndTime.append(lastMonth);
-//        }
-//        if (newMonth.equals(getResources().getString(R.string.five))) {
-//            String lastMonth = (String) getResources().getString(R.string.may);
-//            dateAndTime.append(lastMonth);
-//        }
-//        if (newMonth.equals(getResources().getString(R.string.six))) {
-//            String lastMonth = (String) getResources().getString(R.string.jun);
-//            dateAndTime.append(lastMonth);
-//        }
-//        if (newMonth.equals(getResources().getString(R.string.seven))) {
-//            String lastMonth = (String) getResources().getString(R.string.jul);
-//            dateAndTime.append(lastMonth);
-//        }
-//        if (newMonth.equals(getResources().getString(R.string.eight))) {
-//            String lastMonth = (String) getResources().getString(R.string.aug);
-//            dateAndTime.append(lastMonth);
-//        }
-//        if (newMonth.equals(getResources().getString(R.string.nine))) {
-//            String lastMonth = (String) getResources().getString(R.string.sep);
-//            dateAndTime.append(lastMonth);
-//        }
-//        if (newMonth.equals(getResources().getString(R.string.ten))) {
-//            String lastMonth = (String) getResources().getString(R.string.oct);
-//            dateAndTime.append(lastMonth);
-//        }
-//        if (newMonth.equals(getResources().getString(R.string.eleven))) {
-//            String lastMonth = (String) getResources().getString(R.string.nov);
-//            dateAndTime.append(lastMonth);
-//        }
-//        if (newMonth.equals(getResources().getString(R.string.twelve))) {
-//            String lastMonth = (String) getResources().getString(R.string.dec);
-//            dateAndTime.append(lastMonth);
-//        }
-//
-//        dateAndTime.append(getResources().getString(R.string.space));
-//        dateAndTime.append(newDay);
-//        dateAndTime.append(getResources().getString(R.string.comma));
-//        dateAndTime.append(newYear);
-//        dateAndTime.append(getResources().getString(R.string.comma));
-//        dateAndTime.append(newHour);
-//        dateAndTime.append(getResources().getString(R.string.colon));
-//
-//        if (minuteWrong) {
-//            dateAndTime.append(getResources().getString(R.string.zero));
-//        }
-//        dateAndTime.append(newMinute);
         final ProgressDialog dlg = new ProgressDialog(Add.this);
         dlg.setTitle("Please wait.");
         dlg.setMessage("Please wait.");
         dlg.show();
-
 
         boolean validationError = false;
         StringBuilder validationErrorMessage = new StringBuilder(getResources().getString(R.string.please));
@@ -262,7 +197,13 @@ public class Add extends FragmentActivity {
         event.put("host", host.getText().toString());
         event.put("date", eventDate);
         event.put("approved", false);
-        event.put("fee", fee.getText().toString());
+        String fee = this.fee.getText().toString();
+        if(fee.charAt(0) == '$') {
+            event.put("fee", fee);
+        } else {
+            String feeAmount = "$" + fee;
+            event.put("fee", feeAmount);
+        }
         event.put("upvotes", 0);
         event.put("user", ParseUser.getCurrentUser());
         event.put("university", ParseUser.getCurrentUser().get("university"));
@@ -283,7 +224,6 @@ public class Add extends FragmentActivity {
         StringBuilder thanksForNewEventMessage = new StringBuilder(getResources().getString(R.string.thanks_for_new_event));
         Toast.makeText(Add.this, thanksForNewEventMessage.toString(), Toast.LENGTH_LONG).show();
         finish();
-//        Z
     }
 
     public void setListeners() {
@@ -329,8 +269,11 @@ public class Add extends FragmentActivity {
         host.setBackListener(keyboardCloseListener);
         fee.setBackListener(keyboardCloseListener);
 
+        eventTitle.setOnClickListener(onClickListener);
+        eventDescription.setOnClickListener(onClickListener);
         emoji.setOnClickListener(onClickListener);
         host.setOnClickListener(onClickListener);
+        fee.setOnClickListener(onClickListener);
 
     }
 
@@ -360,7 +303,7 @@ public class Add extends FragmentActivity {
         eventDescriptionHeight = eventDescription.getLayoutParams().height;
         bottomHeight = 176 + windowHeight - (topBarHeight+eventNameTitleHeight + event_descriptionHeight);
 
-        Log.d("Window height: ", ""+windowHeight);
+        Log.d("Window height: ", "" + windowHeight);
         Log.d("Bottom height: ", "" + bottomHeight);
 
     }

@@ -39,6 +39,10 @@ public class PostDataManager {
     public PostDataManager(Activity context){
         this.context = context;
         this.listener = null;
+        this.currentUser = ParseUser.getCurrentUser();
+        if(currentUser == null) {
+            ParseUser.getCurrentUser().fetchIfNeededInBackground();
+        }
     }
 
     public void getData() {

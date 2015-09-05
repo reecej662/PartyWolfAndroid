@@ -31,7 +31,7 @@
     <string name="cancel">Cancel</string>
     <string name="new_post">New Post</string>
     <string name="submit">Submit</string>
-    <string name="event_name_title">Event Name/Title</string>
+    <string name="event_name_title">Event Name</string>
     <string name="other_things">Other things such as day, time, type of food, theme of party, etc...</string>
     <string name="one_emoji">Emoji</string>
     <string name="thanks_for_new_event">Thank you for adding a new event!</string>
@@ -95,7 +95,7 @@
     <string name="nov">"Nov"</string>
     <string name="dec">"Dec"</string>
 
-    <string name="event_description">Event Description</string>
+    <string name="event_description">Other things such as day, time, type of food, theme of party, etc...</string>
     <string name="on_campus">On or Off Campus?</string>
     <string name="please">"Please "</string>
     <string name="enter_a_username"> enter a username</string>

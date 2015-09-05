@@ -228,6 +228,8 @@ public class Settings extends Activity {
     public void logOut (View view) {
         ParseUser.logOut();
         Intent intent = new Intent(this, LoginA.class);
+        setResult(2);
+        finish();
         startActivity(intent);
     }
 
@@ -257,6 +259,18 @@ public class Settings extends Activity {
         }
 
         return userCity;
+    }
+
+    @Override
+    protected void onStop() {
+        setResult(2);
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        setResult(2);
+        super.onDestroy();
     }
 
     /*https://parse.com/questions/updating-a-field-without-retrieving-the-object-first

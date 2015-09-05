@@ -2,70 +2,46 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="com.aloalabs.partywolf.ContactUs">
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
-
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/topBar"
             android:layout_width="fill_parent"
-            android:layout_height="35dp"
+            android:layout_height="50dp"
             android:orientation="horizontal"
             android:background="@color/ColorPrimary">
 
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="fill_parent"
-                android:textColor="@color/White"
                 android:text="Back"
-                android:textSize="15dp"
-                android:background="@null"
-                android:onClick="openSettings"
-                android:gravity="center_vertical"
-                android:layout_marginLeft="10dp"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="fill_parent"
-                android:layout_weight="1" />
+                android:id="@+id/cancel"
+                android:textSize="20sp"
+                android:background="@android:color/transparent"
+                style="@style/add_button_text_white"
+                android:onClick="back"/>
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
+                android:id="@+id/new_post"
                 android:text="Contact Us"
-                android:textColor="@color/White"
-                android:textSize="20dp"
-                android:background="@null"
-                android:layout_gravity="center_vertical" />
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:paddingTop="11dp"
+                android:background="@drawable/blue_blue_button"
+                style="@style/new_post"
+                android:textSize="24sp"
+                android:paddingBottom="10dp" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="fill_parent"
-                android:layout_weight="1" />
+        </RelativeLayout>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:textColor="@color/ColorPrimary"
-                android:text="Back"
-                android:textSize="15dp"
-                android:background="@null" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/contact_us"
+            android:layout_marginTop="25dp"
+            android:layout_below="@id/topBar"
+            android:layout_centerHorizontal="true"/>
 
-        </LinearLayout>
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/contact_us"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"/>
-
-        </ScrollView>
-
-    </LinearLayout>
 
 </RelativeLayout>

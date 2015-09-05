@@ -7,7 +7,15 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
+import java.util.List;
 
 /**
  * Created by reecejackson on 9/3/15.
@@ -60,7 +68,23 @@ public class resizeTest extends Activity {
     }
 
     public void testButton(View v) {
-        Toast.makeText(this, "Button pressed", Toast.LENGTH_LONG).show();
-    }
+        final ParseUser currentUser = ParseUser.getCurrentUser();
+        currentUser.fetchIfNeededInBackground();
+        ParseQuery<ParseObject> vandyQuery = ParseQuery.getQuery("Universities");
+        vandyQuery.whereEqualTo("name", "Vanderbilt University");
+        vandyQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                final ParseObject university = list.get(0);
+                currentUser.put("university", university);
+                currentUser.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        System.out.println("User linked to " + university.getString("name"));
+                    }
+                });
+            }
+        });
 
+    }
 }

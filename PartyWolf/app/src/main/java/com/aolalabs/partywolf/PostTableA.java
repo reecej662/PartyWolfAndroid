@@ -31,9 +31,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.daimajia.swipe.SwipeLayout;
+import com.parse.GetCallback;
+import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.victor.loading.rotate.RotateLoading;
 
 import java.text.SimpleDateFormat;
@@ -65,20 +68,14 @@ import in.srain.cube.views.ptr.indicator.PtrIndicator;
 
 public class PostTableA extends Activity implements OnClickListener{
     private ListView eventList;
-
     private PostDataManager dataManager;
-
-    private ImageButton newPostButton;
-    private Button hypeButton;
-    private Button dateButton;
-    private ImageButton settingsButton;
-    private boolean dateView = true;
     private ParseUser currentUser = null;
-    private Dialog loadingDialog = null;
+    private ArrayAdapter<Event> adapter;
     private LocationManager locationManager;
     private Location userLocation = null;
+    private Dialog loadingDialog = null;
     private boolean firstLoad = true;
-    private ArrayAdapter<Event> adapter;
+    private boolean dateView = true;
 
     @Override
     protected void onCreate(Bundle savedInstance) {
@@ -89,27 +86,34 @@ public class PostTableA extends Activity implements OnClickListener{
         // Go to login screen if no user not currently logged in
         Intent login = new Intent(this, LoginA.class);
 
-        currentUser = ParseUser.getCurrentUser();
-
         try{
             currentUser = ParseUser.getCurrentUser();
-            Log.d("Curent user", currentUser.toString());
             if(currentUser == null) {
                 finish();
                 startActivity(login);
             } else if(currentUser.getNumber("classOf") == null) {
                 Intent i = new Intent(PostTableA.this, ClassOfA.class);
+                System.out.println("This is where I'm starting the login");
                 startActivity(i);
             } else {
-                currentUser.fetchInBackground();
-                getLocation();
+                loadingDialog = getLoadingDialog();
+                loadingDialog.show();
+
+                currentUser.fetchInBackground(new GetCallback<ParseObject>() {
+                    @Override
+                    public void done(ParseObject parseObject, ParseException e) {
+                        setUpActivity();
+                        getLocation();
+                    }
+                });
             }
         } catch (Exception e) {
             startActivity(login);
         }
 
-        loadingDialog = showLoadingDialog();
-        loadingDialog.show();
+    }
+
+    public void setUpActivity(){
 
         dataManager = new PostDataManager(this);
         dataManager.setDataListener(new PostDataManager.DataListener() {
@@ -132,6 +136,8 @@ public class PostTableA extends Activity implements OnClickListener{
                 firstLoad = false;
                 registerClickCallback();
                 loadingDialog.dismiss();
+                findViewById(R.id.wolfSpinner).setVisibility(View.VISIBLE);
+                findViewById(R.id.glassesSpinner).setVisibility(View.VISIBLE);
 
             }
         });
@@ -145,11 +151,11 @@ public class PostTableA extends Activity implements OnClickListener{
         populateListView(dataManager.events);
         registerClickCallback();
 
-        newPostButton = (ImageButton) findViewById(R.id.newPostButton);
         eventList = (ListView) findViewById(R.id.main_list_view);
-        hypeButton = (Button) findViewById(R.id.hypeOption);
-        dateButton = (Button) findViewById(R.id.dateOption);
-        settingsButton = (ImageButton) findViewById(R.id.settingsButton);
+        ImageButton newPostButton = (ImageButton) findViewById(R.id.newPostButton);
+        Button hypeButton = (Button) findViewById(R.id.hypeOption);
+        Button dateButton = (Button) findViewById(R.id.dateOption);
+        ImageButton settingsButton = (ImageButton) findViewById(R.id.settingsButton);
 
         setUpPullToRefresh();
 
@@ -159,56 +165,9 @@ public class PostTableA extends Activity implements OnClickListener{
         settingsButton.setOnClickListener(this);
 
         Log.d("On create:", "Finished on create");
-
     }
 
     //9722610049
-
-    // Handle the user clicking the upvote/unupvote button
-    public void upvoteHandler(View v) {
-        RelativeLayout vwParentRow = (RelativeLayout)v.getParent();
-
-        TextView hype = (TextView) vwParentRow.findViewById(R.id.event_hype_number);
-        Button hypeButton = (Button) vwParentRow.findViewById(R.id.event_hype_button);
-
-        // If the button is in voting mode
-        if(hypeButton.getText().equals("vote")) {
-
-            hypeButton.setBackgroundResource(R.drawable.bluevote);
-            hype.setTextColor(Color.rgb(0, 169, 255));
-
-            // Get the new hype number and set it in the view
-            final Integer hypeNumber = Integer.valueOf(hype.getText().toString()) + 1;
-            hype.setText(hypeNumber.toString());
-
-            // The corresponding object that the row describes
-            ParseObject object = (ParseObject) hypeButton.getTag();
-
-            dataManager.upvoteEvent(object);
-
-            hypeButton.setText("unvote");
-
-        // If the button is in unvote mode
-        } else {
-
-            // Set the button and text back to black
-            hypeButton.setBackgroundResource(R.drawable.vote);
-            hype.setTextColor(Color.rgb(0, 0, 0));
-
-            // Update the number in the view
-            final Integer hypeNumber = Integer.valueOf(hype.getText().toString()) - 1;
-            hype.setText(hypeNumber.toString());
-
-            // Get the corresponding object from the row
-            ParseObject object = (ParseObject) hypeButton.getTag();
-
-            dataManager.unvoteEvent(object);
-
-            hypeButton.setText("vote");
-
-        }
-    }
-
     private void populateListView(ArrayList<Event> events) {
         // Build Adapter
         adapter = new MyListAdapter(events);
@@ -217,24 +176,6 @@ public class PostTableA extends Activity implements OnClickListener{
         ListView list = (ListView) findViewById(R.id.main_list_view);
         list.setDivider(null);
         list.setAdapter(adapter);
-    }
-
-    private void registerClickCallback() {
-        ListView list = (ListView) findViewById(R.id.main_list_view);
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-                Event clickedEvent;
-                if (dateView) {
-                    clickedEvent = dataManager.getEventAtIndex(position);
-                } else {
-                    clickedEvent = dataManager.getSortedEventAtIndex(position);
-                }
-                Intent i = new Intent(PostTableA.this, EventDetailA.class);
-                i.putExtra("event", clickedEvent);
-                startActivity(i);
-            }
-        });
     }
 
     private class MyListAdapter extends ArrayAdapter<Event> {
@@ -393,6 +334,77 @@ public class PostTableA extends Activity implements OnClickListener{
         }
     }
 
+    private void registerClickCallback() {
+        ListView list = (ListView) findViewById(R.id.main_list_view);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
+                Event clickedEvent;
+                if (dateView) {
+                    clickedEvent = dataManager.getEventAtIndex(position);
+                } else {
+                    clickedEvent = dataManager.getSortedEventAtIndex(position);
+                }
+                Intent i = new Intent(PostTableA.this, EventDetailA.class);
+                i.putExtra("event", clickedEvent);
+                startActivity(i);
+            }
+        });
+    }
+
+    // Handle the user clicking the upvote/unupvote button
+    public void upvoteHandler(View v) {
+        RelativeLayout vwParentRow = (RelativeLayout)v.getParent();
+
+        TextView hype = (TextView) vwParentRow.findViewById(R.id.event_hype_number);
+        Button hypeButton = (Button) vwParentRow.findViewById(R.id.event_hype_button);
+
+        // If the button is in voting mode
+        if(hypeButton.getText().equals("vote")) {
+
+            hypeButton.setBackgroundResource(R.drawable.bluevote);
+            hype.setTextColor(Color.rgb(0, 169, 255));
+
+            // Get the new hype number and set it in the view
+            final Integer hypeNumber = Integer.valueOf(hype.getText().toString()) + 1;
+            hype.setText(hypeNumber.toString());
+
+            // The corresponding object that the row describes
+            ParseObject object = (ParseObject) hypeButton.getTag();
+
+            dataManager.upvoteEvent(object);
+
+            hypeButton.setText("unvote");
+
+            // If the button is in unvote mode
+        } else {
+
+            // Set the button and text back to black
+            hypeButton.setBackgroundResource(R.drawable.vote);
+            hype.setTextColor(Color.rgb(0, 0, 0));
+
+            // Update the number in the view
+            final Integer hypeNumber = Integer.valueOf(hype.getText().toString()) - 1;
+            hype.setText(hypeNumber.toString());
+
+            // Get the corresponding object from the row
+            ParseObject object = (ParseObject) hypeButton.getTag();
+
+            dataManager.unvoteEvent(object);
+
+            hypeButton.setText("vote");
+
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == 2) {
+            PostTableA.this.finish();
+        }
+    }
+
     @Override
     public void onClick(View v) {
         Intent i;
@@ -403,7 +415,7 @@ public class PostTableA extends Activity implements OnClickListener{
                     userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 }
                 i.putExtra("location", userLocation);
-                startActivity(i);
+                startActivityForResult(i, 1);
                 break;
             case R.id.dateOption:
                 v.setBackgroundResource(R.drawable.selection_bg);
@@ -434,7 +446,7 @@ public class PostTableA extends Activity implements OnClickListener{
         }
     }
 
-    public Dialog showLoadingDialog() {
+    public Dialog getLoadingDialog() {
 
         Dialog loadingDialog = new Dialog(this);
         loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -449,8 +461,6 @@ public class PostTableA extends Activity implements OnClickListener{
 
         return loadingDialog;
     }
-
-
 
     public void getLocation() {
 
@@ -472,7 +482,7 @@ public class PostTableA extends Activity implements OnClickListener{
                     String city = address.get(0).getLocality() + ", " + address.get(0).getAdminArea();
 
                     currentUser.put("currentCity", city);
-                    currentUser.saveInBackground();
+                    saveUser();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -617,34 +627,30 @@ public class PostTableA extends Activity implements OnClickListener{
                     yOffSet = 0;
                 }
 
-                System.out.println(yOffSet);
-
                 float wolfX = wolf.getX() + yOffSet/12;
                 float glassesX = glasses.getX() - yOffSet/12;
 
                 wolf.setX(max(min(wolfX, wolfMaxOffset), wolfInitialX));
                 glasses.setX(min(max(glassesX, glassesMaxOffset), glassesInitialX));
             }
-
-            public ValueAnimator animateView(final View v) {
-                float maxOffset = v.equals(wolf) ? wolfMaxOffset : glassesMaxOffset;
-
-                ValueAnimator animator = ValueAnimator.ofFloat(v.getX(), maxOffset);
-                animator.setDuration(500);
-                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animator) {
-                        System.out.println(animator.getAnimatedValue());
-                        v.setX(animator.getAnimatedFraction());
-                    }
-
-                });
-
-                return animator;
-            }
         });
 
+    }
+
+    public void saveUser(){
+        try {
+            if(currentUser!=null){
+                currentUser.fetchIfNeededInBackground();
+                currentUser.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        Log.d("saveUser", "User saved");
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public float min(float f1, float f2) {
