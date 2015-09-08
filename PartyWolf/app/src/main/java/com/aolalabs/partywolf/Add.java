@@ -301,7 +301,8 @@ public class Add extends FragmentActivity {
         int event_descriptionHeight = findViewById(R.id.event_description).getLayoutParams().height;
 
         eventDescriptionHeight = eventDescription.getLayoutParams().height;
-        bottomHeight = 176 + windowHeight - (topBarHeight+eventNameTitleHeight + event_descriptionHeight);
+        //bottomHeight = 176 + windowHeight - (topBarHeight+eventNameTitleHeight + event_descriptionHeight);
+        bottomHeight = 325;
 
         Log.d("Window height: ", "" + windowHeight);
         Log.d("Bottom height: ", "" + bottomHeight);

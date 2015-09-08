@@ -49,8 +49,16 @@ public class Settings extends Activity {
 
         userLocation = (Location) getIntent().getExtras().get("location");
         System.out.println(userLocation);
-
-        userCity = getCity(userLocation);
+        if(userLocation != null) {
+            userCity = getCity(userLocation);
+        } else {
+            try{
+                userCity = currentUser.getString("currentCity");
+            } catch (Exception e) {
+                e.printStackTrace();
+                userCity = "Unable to find city";
+            }
+        }
 
         noPicker = (NumberPicker) findViewById(R.id.on_number);
         noPicker.setMaxValue(100);

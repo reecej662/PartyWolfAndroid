@@ -135,7 +135,11 @@ public class PostTableA extends Activity implements OnClickListener{
                 }
                 firstLoad = false;
                 registerClickCallback();
-                loadingDialog.dismiss();
+
+                if(loadingDialog.isShowing()) {
+                    loadingDialog.dismiss();
+                }
+                
                 findViewById(R.id.wolfSpinner).setVisibility(View.VISIBLE);
                 findViewById(R.id.glassesSpinner).setVisibility(View.VISIBLE);
 
