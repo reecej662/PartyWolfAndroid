@@ -113,20 +113,20 @@ public class PostTableA extends Activity implements OnClickListener{
         dataManager = new PostDataManager(this);
 
         dataManager.setDataListener(new PostDataManager.DataListener() {
+//            private boolean eventsLoaded = false;
+//            private boolean upvotesLoaded = false;
+
             @Override
             public void onDataLoaded() {
                 if(firstLoad)
                     populateListView(dataManager.events);
                 else{
-                    //Figure out a way to add new events to listview
-                    //until then....
-                    if(adapter.getClass().equals(MyListAdapter.class)) {
+                    if (adapter.getClass().equals(MyListAdapter.class)) {
                         MyListAdapter tmpAdapter = (MyListAdapter) adapter;
-                        if(!tmpAdapter.getEvents().equals(dataManager.getEvents())) {
+                        if (!tmpAdapter.getEvents().equals(dataManager.getEvents())) {
                             populateListView(dataManager.getEvents());
                         }
                     }
-
                 }
                 firstLoad = false;
                 registerClickCallback();
@@ -163,19 +163,23 @@ public class PostTableA extends Activity implements OnClickListener{
     //9722610049
     private void populateListView(ArrayList<Event> events) {
         // Build Adapter
+        findViewById(R.id.emptyTextView).setVisibility(View.GONE);
+
         adapter = new MyListAdapter(events);
 
         Log.d("Populate List view", "Events size: " + events.size());
 
         if(events.size() == 0) {
-            noEventsFound();
+            findViewById(R.id.emptyTextView).setVisibility(View.VISIBLE);
         } else {
-
+            findViewById(R.id.emptyTextView).setVisibility(View.GONE);
             // Configure the list view
-            ListView list = (ListView) findViewById(R.id.main_list_view);
-            list.setDivider(null);
-            list.setAdapter(adapter);
         }
+
+        ListView list = (ListView) findViewById(R.id.main_list_view);
+        list.setDivider(null);
+        list.setAdapter(adapter);
+
     }
 
     private class MyListAdapter extends ArrayAdapter<Event> {
@@ -584,6 +588,7 @@ public class PostTableA extends Activity implements OnClickListener{
             public void onUIRefreshPrepare(PtrFrameLayout frameLayout) {
                 wolf.setVisibility(View.VISIBLE);
                 glasses.setVisibility(View.VISIBLE);
+                findViewById(R.id.emptyTextView).setVisibility(View.GONE);
             }
 
             @Override

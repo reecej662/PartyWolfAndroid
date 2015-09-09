@@ -37,6 +37,8 @@ public class PostDataManager {
     private Activity context;
     private DataListener listener;
     private UserLocationManager userLocationManager;
+    private boolean eventsLoaded = false;
+    private boolean upvotesLoaded = false;
 
     // Set up and basic utility methods
 
@@ -79,6 +81,7 @@ public class PostDataManager {
 
                 // gonna want to update the data here
                 // But this runs A LOT
+
             }
         });
 
@@ -91,16 +94,23 @@ public class PostDataManager {
             loadEventData();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
+        }
+    }
+
+    public void callListenerLoaded() {
+        if(upvotesLoaded && eventsLoaded) {
             listener.onDataLoaded();
         }
     }
 
     // Figure out a more efficient way to refresh -- wasting queries
     public void refresh() {
-        loadUpvoteData();
-        loadEventData();
-        this.listener.onDataLoaded();
+        try {
+            loadUpvoteData();
+            loadEventData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void clearData() {
@@ -141,7 +151,8 @@ public class PostDataManager {
     }
 
     public ArrayList<Event> getSortedEvents() {
-        return (ArrayList<Event>) this.sortedEvents;
+        sortEvents();
+        return this.sortedEvents;
     }
 
     public ArrayList<ParseObject> getParseEvents() {
@@ -160,6 +171,7 @@ public class PostDataManager {
         clearData();
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Posts");
+        eventsLoaded = false;
 
         java.util.Date today = new java.util.Date();
         GregorianCalendar calendar = new GregorianCalendar();
@@ -188,12 +200,11 @@ public class PostDataManager {
                             if((eventInArea(object) && !object.getBoolean("onCampus")) || (currentUser.get("university").equals(object.get("university")))) {
                                 events.add(new Event(object));
                                 parseEvents.add(object);
-                                System.out.println(object.getString("title"));
                             }
                         }
                     } else {
                         e.printStackTrace();
-                        System.err.println("Error connecting to the network");
+                        Log.d("Event loading", "Error connecting to the network");
                         Toast networkToast = Toast.makeText(PostDataManager.this.context, "Error connecting to the network", Toast.LENGTH_LONG);
                         networkToast.show();
                     }
@@ -202,6 +213,8 @@ public class PostDataManager {
                 } finally {
                     sortEvents();
                     Log.d("Data Manager", "Events Loaded");
+                    eventsLoaded = true;
+                    callListenerLoaded();
                 }
             }
         });
@@ -212,7 +225,7 @@ public class PostDataManager {
 
         ParseRelation upvoteRelation = currentUser.getRelation("upvote_data");
         ParseQuery<ParseObject> upvoteQuery = upvoteRelation.getQuery();
-        Log.d("Upvote relation: ", upvoteRelation.toString());
+        upvotesLoaded = false;
 
         try {
             upvoteQuery.findInBackground(new FindCallback<ParseObject>() {
@@ -230,6 +243,8 @@ public class PostDataManager {
             e.printStackTrace();
         } finally {
             Log.d("Data Manager", "Upvotes Loaded");
+            upvotesLoaded = true;
+            callListenerLoaded();
         }
     }
 
@@ -259,8 +274,6 @@ public class PostDataManager {
                 public void done(ParseException e) {
                     if (e != null)
                         Log.d("Object saving error", e.toString());
-                    System.out.println("New upvote count: " + object.getNumber("upvotes"));
-                    System.out.println("Post updated");
                 }
             });
         }
@@ -285,13 +298,11 @@ public class PostDataManager {
     public void unvoteEvent(ParseObject object) {
 
         // Change the values for the locally stored Event
-        Event upvotedEvent = null;
         for (Event event : events) {
-            if ((upvotedEvent = userUpvoted(event)) != null) {
+            if (event.getObjectID().equals(object.getObjectId())) {
+                Event upvotedEvent = userUpvoted(event);
                 event.unvote();
                 upvoteEvents.remove(upvotedEvent);
-                System.out.println("User unvoted the event");
-                System.out.println("upvoteEvents count: " + upvoteEvents.size());
             }
         }
 
@@ -312,7 +323,6 @@ public class PostDataManager {
                 public void done(ParseException e) {
                     if (e != null)
                         Log.d("Object saving error", e.toString());
-                    System.out.println("Post updated");
                 }
             });
         }
@@ -329,7 +339,6 @@ public class PostDataManager {
                 public void done(ParseException e) {
                     if (e != null)
                         Log.d("User saving error", e.toString());
-                    System.out.println("User updated");
                 }
             });
         }
@@ -387,10 +396,6 @@ public class PostDataManager {
 
     public Location getUserLocation() {
         return userLocationManager.getUserLocation();
-    }
-
-    public ParseGeoPoint getParseUserLocation() {
-        return userLocationManager.getParseLocation();
     }
 
     public String getCity() {

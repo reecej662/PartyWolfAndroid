@@ -1,16 +1,10 @@
 package com.aolalabs.partywolf;
 
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseRelation;
-import com.parse.ParseUser;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by reecejackson on 8/18/15.
@@ -32,25 +26,6 @@ public class Event implements Serializable, Comparable<Event> {
 
     public void setUpvoted(boolean upvoted) {
         this.upvoted = upvoted;
-    }
-
-    public boolean currentUserUpvoted(ParseObject object) {
-        ParseRelation<ParseUser> upvoteRelation = (ParseRelation<ParseUser>) object.get("upvote_data");
-        ParseQuery upvoteQuery = upvoteRelation.getQuery();
-
-        upvoteQuery.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> list, ParseException e) {
-                if(list.contains(ParseUser.getCurrentUser())) {
-                    System.out.println("User has upvoted this thing");
-                    Event.this.upvoted = true;
-                } else {
-                    Event.this.upvoted = false;
-                    System.out.println("User hasn't upvoted this thing");
-                }
-            }
-        });
-        return this.upvoted;
     }
 
     public String getWeekDay() {
@@ -104,7 +79,6 @@ public class Event implements Serializable, Comparable<Event> {
             this.fee = object.getString("fee");
         }
         this.date = object.getDate("date");
-        System.out.println(this.date);
         SimpleDateFormat sdf1 = new SimpleDateFormat("LLLL d"   );
         this.dateOfEvent = sdf1.format(this.date);
 

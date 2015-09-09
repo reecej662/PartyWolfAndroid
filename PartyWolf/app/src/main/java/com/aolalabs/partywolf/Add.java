@@ -189,6 +189,7 @@ public class Add extends FragmentActivity {
 
         Switch onCampusSwitch = (Switch) findViewById(R.id.on_campus);
         Boolean onCampus = onCampusSwitch.isChecked();
+        ParseUser.getCurrentUser().put("banned", "false");
 
         ParseObject event = new ParseObject("Posts");
         event.put("title", eventTitle.getText().toString());
@@ -217,6 +218,7 @@ public class Add extends FragmentActivity {
             public void done(ParseException e) {
                 if(e != null) {
                     Log.d("Error saving new event", e.toString());
+                    e.printStackTrace();
                 } else {
                     Log.d("New event", "Save complete!");
                 }
@@ -306,10 +308,6 @@ public class Add extends FragmentActivity {
         eventDescriptionHeight = eventDescription.getLayoutParams().height;
         bottomHeight = 176 + windowHeight - (topBarHeight+eventNameTitleHeight + event_descriptionHeight);
         //bottomHeight = 325;
-
-        Log.d("Window height: ", "" + windowHeight);
-        Log.d("Bottom height: ", "" + bottomHeight);
-
     }
 
     public void openPrevious(View view){

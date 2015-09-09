@@ -52,7 +52,7 @@
         android:id="@+id/emptyTextView"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:text="No events to dispaly, click the + to add one!"
+        android:text="No events to display, click the + to add one!"
         android:background="#ffffff"
         android:textSize="22sp"
         android:gravity="center"
