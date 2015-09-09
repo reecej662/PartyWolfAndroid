@@ -101,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/fee"
-                android:text="@string/fee"
+                android:hint="@string/fee"
                 android:inputType="numberDecimal"
                 android:textColorHint="#d3d3d3"
                 android:textColor="@color/Black"

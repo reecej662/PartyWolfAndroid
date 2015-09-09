@@ -47,13 +47,21 @@
 
     </in.srain.cube.views.ptr.PtrClassicFrameLayout>
 
-    <!--<android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/pullToRefresh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/topBar">
 
-    </android.support.v4.widget.SwipeRefreshLayout>-->
+    <TextView
+        android:id="@+id/emptyTextView"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:text="No events to dispaly, click the + to add one!"
+        android:background="#ffffff"
+        android:textSize="22sp"
+        android:gravity="center"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="75dp"
+        android:layout_marginTop="110dp"
+        android:visibility="gone"
+        />
 
     <View
         android:layout_width="match_parent"

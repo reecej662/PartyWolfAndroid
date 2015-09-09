@@ -43,12 +43,8 @@ public class ClassOfA extends Activity {
         currentUser.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                if(currentUser.getBoolean("email")) {
-                    Intent i = new Intent(ClassOfA.this, PostTableA.class);
-                    startActivity(i);
-                } else {
-                    //showConfirmEmailDialog(ClassOfA.this);
-                }
+                Intent i = new Intent(ClassOfA.this, PostTableA.class);
+                startActivity(i);
             }
         });
     }

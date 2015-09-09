@@ -35,7 +35,6 @@ public class Settings extends Activity {
     private Integer onHype;
     private ParseUser currentUser = null;
     private ImageView profilePicture = null;
-    private Location userLocation = null;
     private String userCity = null;
 
     NumberPicker noPicker = null;
@@ -47,19 +46,7 @@ public class Settings extends Activity {
 
         currentUser = ParseUser.getCurrentUser();
 
-        userLocation = (Location) getIntent().getExtras().get("location");
-        System.out.println(userLocation);
-        if(userLocation != null) {
-            userCity = getCity(userLocation);
-        } else {
-            try{
-                userCity = currentUser.getString("currentCity");
-            } catch (Exception e) {
-                e.printStackTrace();
-                userCity = "Unable to find city";
-            }
-        }
-
+        userCity = (String) getIntent().getExtras().get("city");
         noPicker = (NumberPicker) findViewById(R.id.on_number);
         noPicker.setMaxValue(100);
         noPicker.setMinValue(0);

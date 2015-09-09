@@ -23,7 +23,7 @@ public class InitializeApp extends Application {
 
     public void onCreate(){
         super.onCreate();
-        Crashlytics crashlytics = new Crashlytics.Builder().disabled(BuildConfig.DEBUG).build();
+        //Crashlytics crashlytics = new Crashlytics.Builder().disabled(BuildConfig.DEBUG).build();
         //Fabric.with(this, crashlytics);
         Fabric.with(this, new Crashlytics());
 

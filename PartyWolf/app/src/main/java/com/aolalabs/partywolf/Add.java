@@ -154,13 +154,13 @@ public class Add extends FragmentActivity {
             validationErrorMessage.append(getResources().getString(R.string.enter_a_host));
         }
 
-        if (fee.getText().toString().trim().length() < 5 ) {
-            if (validationError) {
-                validationErrorMessage.append(getResources().getString(R.string.and));
-            }
-            validationError = true;
-            validationErrorMessage.append(getResources().getString(R.string.enter_a_fee));
-        }
+//        if (fee.getText().toString().trim().length() < 5 ) {
+//            if (validationError) {
+//                validationErrorMessage.append(getResources().getString(R.string.and));
+//            }
+//            validationError = true;
+//            validationErrorMessage.append(getResources().getString(R.string.enter_a_fee));
+//        }
 
         validationErrorMessage.append(getResources().getString(R.string.period));
 
@@ -175,7 +175,7 @@ public class Add extends FragmentActivity {
 
         int RangeLow = 55357; // can get range from e.g. http://www.utf8-chartable.de/unicode-utf8-table.pl
         int RangeHigh = 55357;
-        for(int iLetter = 0; iLetter < emojiString.length() ; iLetter++) {
+        for (int iLetter = 0; iLetter < emojiString.length(); iLetter++) {
             int cv = emojiString.codePointAt(iLetter);
             if (cv >= RangeLow && cv <= RangeHigh) {
                 // Not emoji
@@ -198,7 +198,10 @@ public class Add extends FragmentActivity {
         event.put("date", eventDate);
         event.put("approved", false);
         String fee = this.fee.getText().toString();
-        if(fee.charAt(0) == '$') {
+        if(fee.equals("")){
+            fee = "$0.00";
+            event.put("fee", fee);
+        }else if(fee.charAt(0) == '$') {
             event.put("fee", fee);
         } else {
             String feeAmount = "$" + fee;
@@ -301,8 +304,8 @@ public class Add extends FragmentActivity {
         int event_descriptionHeight = findViewById(R.id.event_description).getLayoutParams().height;
 
         eventDescriptionHeight = eventDescription.getLayoutParams().height;
-        //bottomHeight = 176 + windowHeight - (topBarHeight+eventNameTitleHeight + event_descriptionHeight);
-        bottomHeight = 325;
+        bottomHeight = 176 + windowHeight - (topBarHeight+eventNameTitleHeight + event_descriptionHeight);
+        //bottomHeight = 325;
 
         Log.d("Window height: ", "" + windowHeight);
         Log.d("Bottom height: ", "" + bottomHeight);

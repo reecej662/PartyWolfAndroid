@@ -3,15 +3,9 @@ package com.aolalabs.partywolf;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -33,7 +27,6 @@ import android.widget.Toast;
 import com.daimajia.swipe.SwipeLayout;
 import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -41,8 +34,6 @@ import com.victor.loading.rotate.RotateLoading;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import in.srain.cube.views.ptr.PtrClassicDefaultHeader;
 import in.srain.cube.views.ptr.PtrDefaultHandler;
@@ -71,8 +62,6 @@ public class PostTableA extends Activity implements OnClickListener{
     private PostDataManager dataManager;
     private ParseUser currentUser = null;
     private ArrayAdapter<Event> adapter;
-    private LocationManager locationManager;
-    private Location userLocation = null;
     private Dialog loadingDialog = null;
     private boolean firstLoad = true;
     private boolean dateView = true;
@@ -93,7 +82,6 @@ public class PostTableA extends Activity implements OnClickListener{
                 startActivity(login);
             } else if(currentUser.getNumber("classOf") == null) {
                 Intent i = new Intent(PostTableA.this, ClassOfA.class);
-                System.out.println("This is where I'm starting the login");
                 startActivity(i);
             } else {
                 loadingDialog = getLoadingDialog();
@@ -102,8 +90,8 @@ public class PostTableA extends Activity implements OnClickListener{
                 currentUser.fetchInBackground(new GetCallback<ParseObject>() {
                     @Override
                     public void done(ParseObject parseObject, ParseException e) {
+                        //getLocation()
                         setUpActivity();
-                        getLocation();
                     }
                 });
             }
@@ -113,13 +101,20 @@ public class PostTableA extends Activity implements OnClickListener{
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        saveUser();
+    }
+
     public void setUpActivity(){
 
+        // Set up data manager
         dataManager = new PostDataManager(this);
+
         dataManager.setDataListener(new PostDataManager.DataListener() {
             @Override
             public void onDataLoaded() {
-                Log.d("dataManager", "Data loaded");
                 if(firstLoad)
                     populateListView(dataManager.events);
                 else{
@@ -139,18 +134,14 @@ public class PostTableA extends Activity implements OnClickListener{
                 if(loadingDialog.isShowing()) {
                     loadingDialog.dismiss();
                 }
-                
+
                 findViewById(R.id.wolfSpinner).setVisibility(View.VISIBLE);
                 findViewById(R.id.glassesSpinner).setVisibility(View.VISIBLE);
-
+                Log.d("Post Table", "Data loading");
             }
         });
 
-        dataManager.getData();
-
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        dataManager.setUserLocation(userLocation);
+        dataManager.setUp();
 
         populateListView(dataManager.events);
         registerClickCallback();
@@ -167,8 +158,6 @@ public class PostTableA extends Activity implements OnClickListener{
         hypeButton.setOnClickListener(this);
         dateButton.setOnClickListener(this);
         settingsButton.setOnClickListener(this);
-
-        Log.d("On create:", "Finished on create");
     }
 
     //9722610049
@@ -176,10 +165,17 @@ public class PostTableA extends Activity implements OnClickListener{
         // Build Adapter
         adapter = new MyListAdapter(events);
 
-        // Configure the list view
-        ListView list = (ListView) findViewById(R.id.main_list_view);
-        list.setDivider(null);
-        list.setAdapter(adapter);
+        Log.d("Populate List view", "Events size: " + events.size());
+
+        if(events.size() == 0) {
+            noEventsFound();
+        } else {
+
+            // Configure the list view
+            ListView list = (ListView) findViewById(R.id.main_list_view);
+            list.setDivider(null);
+            list.setAdapter(adapter);
+        }
     }
 
     private class MyListAdapter extends ArrayAdapter<Event> {
@@ -334,8 +330,43 @@ public class PostTableA extends Activity implements OnClickListener{
             loadingDialog.dismiss();
 
             return itemView;
-
         }
+    }
+
+    public void noEventsFound() {
+
+//        One of these is gonna work I swear..
+
+//        Log.d("No events", "I should be doing something");
+//        findViewById(R.id.main_list_view).setVisibility(View.INVISIBLE);
+//        View emptyLayout = getLayoutInflater().inflate(R.layout.empty_posts_table, (ListView) findViewById(R.id.main_list_view), false);
+//        PtrFrameLayout pullToRefresh = (PtrFrameLayout) findViewById(R.id.pullToRefresh);
+//        TextView emptyTextView = (TextView) emptyLayout.findViewById(R.id.emptyTextView);
+//        LinearLayout parent = (LinearLayout) emptyTextView.getParent();
+//        parent.removeAllViews();
+//        pullToRefresh.addView(emptyTextView);
+
+//        PtrFrameLayout pullToRefresh = (PtrFrameLayout) findViewById(R.id.pullToRefresh);
+//        TextView emptyText = (TextView) findViewById(R.id.emptyTextView);
+//        RelativeLayout parent = (RelativeLayout) emptyText.getParent();
+//        parent.removeView(emptyText);
+//        pullToRefresh.addView(emptyText);
+
+//        ListView mainListView = (ListView) findViewById(R.id.main_list_view);
+//        mainListView.setVisibility(View.GONE);
+//        TextView emptyTextView = new TextView(this, null);
+//        emptyTextView.setHeight(800);
+//        emptyTextView.setWidth(500);
+//        emptyTextView.setGravity(Gravity.CENTER);
+//        emptyTextView.setPadding(10, 10, 10, 10);
+//        emptyTextView.setText("No events to display, click the + to add one!");
+//        emptyTextView.setTextColor(Color.argb(0, 0, 0, 0));
+//        emptyTextView.setTextSize(22);
+//        PtrFrameLayout pullToRefresh = (PtrFrameLayout) findViewById(R.id.pullToRefresh);
+//        pullToRefresh.addView(emptyTextView);
+
+        findViewById(R.id.emptyTextView).setVisibility(View.VISIBLE);
+
     }
 
     private void registerClickCallback() {
@@ -415,10 +446,7 @@ public class PostTableA extends Activity implements OnClickListener{
         switch(v.getId()) {
             case R.id.newPostButton:
                 i = new Intent(this, Add.class);
-                if(userLocation == null) {
-                    userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                }
-                i.putExtra("location", userLocation);
+                i.putExtra("location", dataManager.getUserLocation());
                 startActivityForResult(i, 1);
                 break;
             case R.id.dateOption:
@@ -438,10 +466,7 @@ public class PostTableA extends Activity implements OnClickListener{
                 break;
             case R.id.settingsButton:
                 i = new Intent(this, Settings.class);
-                if(userLocation == null) {
-                    userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                }
-                i.putExtra("location", userLocation);
+                i.putExtra("city", dataManager.getCity());
                 startActivity(i);
                 break;
             default:
@@ -466,52 +491,6 @@ public class PostTableA extends Activity implements OnClickListener{
         return loadingDialog;
     }
 
-    public void getLocation() {
-
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                double lat = location.getLatitude();
-                double lng = location.getLongitude();
-
-                userLocation = location;
-                dataManager.setUserLocation(userLocation);
-                currentUser.put("currentLocation", new ParseGeoPoint(lat, lng));
-
-                Geocoder geoCoder = new Geocoder(PostTableA.this, Locale.getDefault());
-                try {
-                    List<Address> address = geoCoder.getFromLocation(lat, lng, 1);
-                    String city = address.get(0).getLocality() + ", " + address.get(0).getAdminArea();
-
-                    currentUser.put("currentCity", city);
-                    saveUser();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-
-    }
 
     public void setUpPullToRefresh() {
         PtrFrameLayout pullToRefresh = (PtrFrameLayout) findViewById(R.id.pullToRefresh);
@@ -597,6 +576,8 @@ public class PostTableA extends Activity implements OnClickListener{
                 newHeader.setBackgroundColor(Color.argb(0, 255, 255, 255));
                 wolf.setX(wolfInitialX);
                 glasses.setX(glassesInitialX);
+                wolf.setVisibility(View.GONE);
+                glasses.setVisibility(View.GONE);
             }
 
             @Override

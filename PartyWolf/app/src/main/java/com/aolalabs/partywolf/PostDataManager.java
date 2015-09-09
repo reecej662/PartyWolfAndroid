@@ -1,11 +1,13 @@
 package com.aolalabs.partywolf;
 
 import android.app.Activity;
+import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -34,15 +36,53 @@ public class PostDataManager {
     protected List<ParseObject> upvoteObjects = new ArrayList<>();
     private Activity context;
     private DataListener listener;
-    private Location userLocation = null;
+    private UserLocationManager userLocationManager;
+
+    // Set up and basic utility methods
 
     public PostDataManager(Activity context){
         this.context = context;
         this.listener = null;
         this.currentUser = ParseUser.getCurrentUser();
+    }
+
+    public void setUp() {
         if(currentUser == null) {
-            ParseUser.getCurrentUser().fetchIfNeededInBackground();
+            ParseUser.getCurrentUser().fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject parseObject, ParseException e) {
+                    setUpLocation();
+                }
+            });
+        } else {
+            setUpLocation();
         }
+    }
+
+    public void setUpLocation() {
+        this.userLocationManager = new UserLocationManager(context);
+
+        userLocationManager.setListener(new UserLocationManager.UserLocationListener() {
+            @Override
+            public void locationFound() {
+                // Returns when the user's location is not null
+                // DON'T USE LOCATION UNTIL THIS RETURNS
+
+
+                // gonna want to get the data here
+                // only runs on the first time
+                getData();
+            }
+
+            @Override
+            public void locationUpdated() {
+
+                // gonna want to update the data here
+                // But this runs A LOT
+            }
+        });
+
+        userLocationManager.getLocation();
     }
 
     public void getData() {
@@ -51,7 +91,41 @@ public class PostDataManager {
             loadEventData();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            listener.onDataLoaded();
         }
+    }
+
+    // Figure out a more efficient way to refresh -- wasting queries
+    public void refresh() {
+        loadUpvoteData();
+        loadEventData();
+        this.listener.onDataLoaded();
+    }
+
+    public void clearData() {
+        events.clear();
+        sortedEvents.clear();
+        parseEvents.clear();
+        upvoteEvents.clear();
+        upvoteObjects.clear();
+    }
+
+    public void sortEvents() {
+        sortedEvents.clear();
+        sortedEvents.addAll(events);
+        Collections.sort(sortedEvents);
+    }
+
+    // Getters
+
+    public ParseObject parseObjectForEvent(Event e) {
+        for(ParseObject object : parseEvents) {
+            if(object.getObjectId().equals(e.getObjectID())) {
+                return object;
+            }
+        }
+        return null;
     }
 
     public Event getEventAtIndex(int index) {
@@ -74,26 +148,10 @@ public class PostDataManager {
         return (ArrayList<ParseObject>) parseEvents;
     }
 
-    public void sortEvents() {
-        sortedEvents.clear();
-        sortedEvents.addAll(events);
-        Collections.sort(sortedEvents);
-    }
 
-    public void clearData() {
-        events.clear();
-        sortedEvents.clear();
-        parseEvents.clear();
-        upvoteEvents.clear();
-        upvoteObjects.clear();
+    public Context getContext() {
+        return this.context;
     }
-
-    public void refresh() {
-        loadUpvoteData();
-        loadEventData();
-        this.listener.onDataLoaded();
-    }
-
 
     // Methods to load data into class
 
@@ -112,13 +170,7 @@ public class PostDataManager {
 
         java.util.Date oneWeek = new java.util.Date(today.getTime()+604800000);
 
-        /*SimpleDateFormat sdf = new SimpleDateFormat("EEEE");;
-        final String weekDay =  sdf.format(calendar.getTime());*/
-
         try {
-            //ParseObject university = currentUser.getParseObject("university");
-            //ParseObject realUniversity = ParseObject.createWithoutData("Universities", university.getObjectId());
-            //query.whereEqualTo("university", realUniversity);
             query.whereEqualTo("approved", true);
             query.whereGreaterThanOrEqualTo("date", startOfDay);
             query.whereLessThanOrEqualTo("date", oneWeek);
@@ -149,11 +201,7 @@ public class PostDataManager {
                     ex.printStackTrace();
                 } finally {
                     sortEvents();
-                    //populateListView((ArrayList<Event>) events);
-                    Log.d("Event loading", "Finished");
-                    if(PostDataManager.this.listener != null) {
-                        listener.onDataLoaded();
-                    }
+                    Log.d("Data Manager", "Events Loaded");
                 }
             }
         });
@@ -170,7 +218,7 @@ public class PostDataManager {
             upvoteQuery.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> list, ParseException e) {
-                    if(list != null) {
+                    if (list != null) {
                         for (ParseObject object : list) {
                             upvoteEvents.add(new Event(object));
                             upvoteObjects.add(object);
@@ -181,7 +229,7 @@ public class PostDataManager {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            Log.d("Upvote loading", "Finished");
+            Log.d("Data Manager", "Upvotes Loaded");
         }
     }
 
@@ -288,15 +336,6 @@ public class PostDataManager {
 
     }
 
-    public ParseObject parseObjectForEvent(Event e) {
-        for(ParseObject object : parseEvents) {
-            if(object.getObjectId().equals(e.getObjectID())) {
-                return object;
-            }
-        }
-        return null;
-    }
-
     public Event userUpvoted(Event event) {
         for(Event upvoted : upvoteEvents) {
             if(event.getObjectID().equals(upvoted.getObjectID())){
@@ -306,6 +345,8 @@ public class PostDataManager {
         return null;
     }
 
+    // Interface and method to set up DataListener
+
     public interface DataListener {
         void onDataLoaded();
     }
@@ -314,33 +355,46 @@ public class PostDataManager {
         this.listener = listener;
     }
 
+    // Methods to deal with location
+
     public boolean eventInArea(ParseObject object) {
 
         ParseGeoPoint eventLocation = object.getParseGeoPoint("postLocation");
 
-        /*try {
-            System.out.println("Latitude: " + this.userLocation.getLatitude() + " Longitude: " + this.userLocation.getLongitude());
-        } catch (Exception e) {
-            System.out.println("Location was null");
-        }*/
+        if(userLocationManager.locationAvailable()) {
+            ParseGeoPoint userLocation;
 
-        ParseGeoPoint userLocation = new ParseGeoPoint(this.userLocation.getLatitude(), this.userLocation.getLongitude());
+            try {
+                userLocation = userLocationManager.getParseLocation();
+            } catch (Exception e) {
+                e.printStackTrace();
+                userLocation = currentUser.getParseGeoPoint("currentLocation");
+            }
 
-        Double distance = eventLocation.distanceInMilesTo(userLocation);
+            Double distance = eventLocation.distanceInMilesTo(userLocation);
 
-        if (distance < 20) {
-            return (true);
+            if (distance < 20) {
+                return (true);
+            } else {
+                return (false);
+            }
         } else {
-            return (false);
+            Log.d("Event in Area: ", "location not avaliable");
+            return false;
         }
 
     }
 
     public Location getUserLocation() {
-        return userLocation;
+        return userLocationManager.getUserLocation();
     }
 
-    public void setUserLocation(Location userLocation) {
-        this.userLocation = userLocation;
+    public ParseGeoPoint getParseUserLocation() {
+        return userLocationManager.getParseLocation();
     }
+
+    public String getCity() {
+        return userLocationManager.getCurrentCity();
+    }
+
 }
