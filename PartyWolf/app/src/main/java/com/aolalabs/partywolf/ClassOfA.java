@@ -22,12 +22,16 @@ public class ClassOfA extends Activity {
     Spinner iAmPrompt;
     Spinner classOfPrompt;
     Integer classOf;
+    ParseUser currentUser;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.class_of);
+
+        currentUser = ParseUser.getCurrentUser();
+        currentUser.fetchIfNeededInBackground();
 
         iAmPrompt = (Spinner) findViewById(R.id.iAmPrompt);
         classOfPrompt = (Spinner) findViewById(R.id.classNumber);
@@ -38,7 +42,6 @@ public class ClassOfA extends Activity {
 
     public void continueButton(View v) {
         System.out.println("User is class of " + classOf);
-        final ParseUser currentUser = ParseUser.getCurrentUser();
         currentUser.put("classOf", classOf);
         currentUser.saveInBackground(new SaveCallback() {
             @Override

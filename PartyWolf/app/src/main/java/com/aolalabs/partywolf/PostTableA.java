@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.daimajia.swipe.SwipeLayout;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -41,14 +42,6 @@ import in.srain.cube.views.ptr.PtrFrameLayout;
 import in.srain.cube.views.ptr.PtrUIHandler;
 import in.srain.cube.views.ptr.header.StoreHouseHeader;
 import in.srain.cube.views.ptr.indicator.PtrIndicator;
-
-//import com.walnutlabs.android.ProgressHUD;
-
-// Array of options --> ArrayAdapter --> ListView
-
-//List view: {views: da_items.xml}
-
-// Fix bug that makes the buttons blue more consistently
 
 /**
  * Created by reecejackson on 8/18/15.
@@ -86,6 +79,7 @@ public class PostTableA extends Activity implements OnClickListener{
             } else {
                 loadingDialog = getLoadingDialog();
                 loadingDialog.show();
+                checkInstallation();
 
                 currentUser.fetchInBackground(new GetCallback<ParseObject>() {
                     @Override
@@ -113,9 +107,6 @@ public class PostTableA extends Activity implements OnClickListener{
         dataManager = new PostDataManager(this);
 
         dataManager.setDataListener(new PostDataManager.DataListener() {
-//            private boolean eventsLoaded = false;
-//            private boolean upvotesLoaded = false;
-
             @Override
             public void onDataLoaded() {
                 if(firstLoad)
@@ -131,10 +122,6 @@ public class PostTableA extends Activity implements OnClickListener{
                 firstLoad = false;
                 registerClickCallback();
 
-                if(loadingDialog.isShowing()) {
-                    loadingDialog.dismiss();
-                }
-
                 findViewById(R.id.wolfSpinner).setVisibility(View.VISIBLE);
                 findViewById(R.id.glassesSpinner).setVisibility(View.VISIBLE);
                 Log.d("Post Table", "Data loading");
@@ -142,8 +129,6 @@ public class PostTableA extends Activity implements OnClickListener{
         });
 
         dataManager.setUp();
-
-        populateListView(dataManager.events);
         registerClickCallback();
 
         eventList = (ListView) findViewById(R.id.main_list_view);
@@ -162,9 +147,8 @@ public class PostTableA extends Activity implements OnClickListener{
 
     //9722610049
     private void populateListView(ArrayList<Event> events) {
-        // Build Adapter
-        findViewById(R.id.emptyTextView).setVisibility(View.GONE);
 
+        findViewById(R.id.emptyTextView).setVisibility(View.GONE);
         adapter = new MyListAdapter(events);
 
         Log.d("Populate List view", "Events size: " + events.size());
@@ -179,6 +163,13 @@ public class PostTableA extends Activity implements OnClickListener{
         ListView list = (ListView) findViewById(R.id.main_list_view);
         list.setDivider(null);
         list.setAdapter(adapter);
+
+        // Use this to refresh:
+        // adapter.notifyDataSetChanged();
+
+        if(loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
 
     }
 
@@ -225,7 +216,6 @@ public class PostTableA extends Activity implements OnClickListener{
 
             button.setTag(dataManager.parseObjectForEvent(currentEvent));
 
-            int height = daySection.getLayoutParams().height;
             Event previousEvent = new Event();
 
             if(position != 0) {
@@ -284,9 +274,6 @@ public class PostTableA extends Activity implements OnClickListener{
             swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
             swipeLayout.setOnClickListener(clickListener);
 
-            //add drag edge.(If the BottomView has 'layout_gravity' attribute, this line is unnecessary)
-//            swipeLayout.addDrag(SwipeLayout.DragEdge.Right, findViewById(R.id.bottom_wrapper));
-
             swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener() {
                 @Override
                 public void onClose(SwipeLayout layout) {
@@ -330,8 +317,6 @@ public class PostTableA extends Activity implements OnClickListener{
                     newReport.submit();
                 }
             });
-
-            loadingDialog.dismiss();
 
             return itemView;
         }
@@ -640,6 +625,62 @@ public class PostTableA extends Activity implements OnClickListener{
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void checkInstallation() {
+        final ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+        if(currentUser != null) {
+            ParseUser userInstallation = (ParseUser) installation.getParseObject("user");
+            if (userInstallation != null) {
+                // All good, no need to fetch stuff
+            } else {
+                currentUser.fetchInBackground();
+
+                installation.put("user", currentUser);
+
+                try{
+                    installation.put("onStatus", currentUser.getBoolean("onStatus"));
+                } catch (Exception e) {
+                    installation.put("onStatus", true);
+                    currentUser.put("onStatus", true);
+                }
+
+                try{
+                    installation.put("onNew", currentUser.getBoolean("onNew"));
+                } catch (Exception e) {
+                    installation.put("onNew", true);
+                    currentUser.put("onNew", true);
+                }
+
+                try {
+                    installation.put("onHype", currentUser.getInt("onHype"));
+                } catch (Exception e) {
+                    installation.put("onHype", -1);
+                    currentUser.put("onHype", -1);
+                }
+
+                currentUser.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        Log.d("Check installation", "user saved");
+                        ParseObject university;
+                        try {
+                            university = currentUser.getParseObject("university");
+                            installation.addUnique("channels", university.getObjectId());
+                            installation.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    Log.d("Save installation", "installation is saved");
+                                }
+                            });
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                });
+
+            }
         }
     }
 
