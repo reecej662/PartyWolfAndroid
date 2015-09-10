@@ -23,9 +23,9 @@ public class InitializeApp extends Application {
 
     public void onCreate(){
         super.onCreate();
-        //Crashlytics crashlytics = new Crashlytics.Builder().disabled(BuildConfig.DEBUG).build();
-        //Fabric.with(this, crashlytics);
-        Fabric.with(this, new Crashlytics());
+        Crashlytics crashlytics = new Crashlytics.Builder().disabled(BuildConfig.DEBUG).build();
+        Fabric.with(this, crashlytics);
+        //Fabric.with(this, new Crashlytics());
 
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "8IiZUWr2nVlthlX1VVrq3gDHXMfuhefW3EIbBdzE", "TNc5sg3go9lqQBcdizIZvgwa3wmXrDPo0D7txBTT");

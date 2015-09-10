@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -21,21 +19,23 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
-
-import java.util.List;
-import java.util.Locale;
+import com.parse.SaveCallback;
 
 public class Settings extends Activity {
 
     private Boolean initialFirstCheck;
     private Boolean initialSecondCheck;
     private String userId;
+    private Switch onNewSwitch;
+    private Switch onStatusSwitch;
+    private NumberPicker onHypePicker;
     private Boolean onNew;
     private Boolean onStatus;
     private Integer onHype;
     private ParseUser currentUser = null;
     private ImageView profilePicture = null;
     private String userCity = null;
+
 
     NumberPicker noPicker = null;
 
@@ -45,6 +45,7 @@ public class Settings extends Activity {
         setContentView(R.layout.activity_settings);
 
         currentUser = ParseUser.getCurrentUser();
+        currentUser.fetchInBackground();
 
         userCity = (String) getIntent().getExtras().get("city");
         noPicker = (NumberPicker) findViewById(R.id.on_number);
@@ -58,10 +59,25 @@ public class Settings extends Activity {
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                if(onHypePicker.getValue() == 0) {
+                    currentUser.put("onHype", -1);
+                } else {
+                    currentUser.put("onHype", onHypePicker.getValue());
+                }
+
+                currentUser.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        currentUser.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                finish();
+                            }
+                        });
+                    }
+                });
             }
         });
-        currentUser.saveInBackground();
     }
 
     protected void onStart(){
@@ -73,69 +89,48 @@ public class Settings extends Activity {
         onHype = currentUser.getInt("onHype");
 
 
-        Switch firstSwitch = (Switch) findViewById(R.id.first_notification);
-        Switch secondSwitch = (Switch) findViewById(R.id.second_notification);
-        NumberPicker onNewHype = (NumberPicker) findViewById(R.id.on_number);
+        onStatusSwitch = (Switch) findViewById(R.id.first_notification);
+        onNewSwitch = (Switch) findViewById(R.id.second_notification);
+        onHypePicker = (NumberPicker) findViewById(R.id.on_number);
         profilePicture = (ImageView) findViewById(R.id.userProfilePic);
 
+        onNewSwitch.setChecked(onNew);
+        onStatusSwitch.setChecked(onStatus);
+        onHypePicker.setValue(onHype);
 
-        if (onNew) {
-            firstSwitch.setChecked(true);
-        } else {
-            firstSwitch.setChecked(false);
-        }
+        setContent();
+        setUpSwitches();
+    }
 
-        if (onStatus) {
-            secondSwitch.setChecked(true);
-        } else {
-            secondSwitch.setChecked(false);
-        }
+    private void setUpSwitches() {
 
-        onNewHype.setValue(onHype);
-
-        /*ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("User");
-        query.getInBackground(userId, new GetCallback<ParseObject>() {
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    String hello = (String) object.get("hello");
-                    Toast.makeText(Settings.this, "hello" + hello,Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(Settings.this, "Wrong "+ e, Toast.LENGTH_LONG).show();// something went wrong
-                }
+        onNewSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("On status", "User changed on new notification to " + onNewSwitch.isChecked());
+                currentUser.put("onNew", onNewSwitch.isChecked());
             }
         });
 
+        onStatusSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("On status", "User changed on status notification to " + onStatusSwitch.isChecked());
+                currentUser.put("onStatus", onStatusSwitch.isChecked());
+            }
+        });
 
-        boolean initialFirstBoolean = currentUser.getBoolean("onNew");
-        onHype = ParseUser.getCurrentUser().getInt("onHype");
-
-        noPicker.setValue(onHype);
-
-        boolean initialSecondBoolean = currentUser.getBoolean("onNew");
-
-
-        if (initialFirstBoolean) {
-            Switch firstSwitch = (Switch) findViewById(R.id.first_notification);
-            firstSwitch.setChecked(true);
-        } else {
-            Switch firstSwitch = (Switch) findViewById(R.id.first_notification);
-            firstSwitch.setChecked(false);
-        }
-
-        if (initialSecondBoolean) {
-            Switch secondSwitch = (Switch) findViewById(R.id.second_notification);
-            secondSwitch.setChecked(true);
-        } else {
-            Switch secondSwitch = (Switch) findViewById(R.id.second_notification);
-            secondSwitch.setChecked(false);
-        }*/
-
-
-        //Check status of switches upon activity start up
-        initialFirstCheck = firstSwitch.isChecked();
-        initialSecondCheck = secondSwitch.isChecked();
-
-        setContent();
+        onHypePicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                Log.d("On hype", "User changed their hype number to " + onHypePicker.getValue());
+                if(onHypePicker.getValue() == 0) {
+                    currentUser.put("onHype", -1);
+                } else {
+                    currentUser.put("onHype", onHypePicker.getValue());
+                }
+            }
+        });
     }
 
     private void setContent() {
@@ -236,34 +231,6 @@ public class Settings extends Activity {
         setResult(2);
         finish();
         startActivity(intent);
-    }
-
-    public String getCity(Location userLocation) {
-        double lat = userLocation.getLatitude();
-        double lng = userLocation.getLongitude();
-
-        try {
-            userCity = currentUser.getString("currentCity");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (userCity == null) {
-            Geocoder geoCoder = new Geocoder(Settings.this, Locale.getDefault());
-            try {
-                List<Address> address = geoCoder.getFromLocation(lat, lng, 1);
-                String city = address.get(0).getLocality() + ", " + address.get(0).getAdminArea();
-
-                currentUser.put("currentCity", city);
-                userCity = city;
-                System.out.println("I'm doing this");
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        return userCity;
     }
 
     @Override
