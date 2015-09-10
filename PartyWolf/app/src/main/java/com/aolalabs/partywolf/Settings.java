@@ -23,21 +23,12 @@ import com.parse.SaveCallback;
 
 public class Settings extends Activity {
 
-    private Boolean initialFirstCheck;
-    private Boolean initialSecondCheck;
-    private String userId;
-    private Switch onNewSwitch;
-    private Switch onStatusSwitch;
-    private NumberPicker onHypePicker;
-    private Boolean onNew;
-    private Boolean onStatus;
-    private Integer onHype;
     private ParseUser currentUser = null;
     private ImageView profilePicture = null;
     private String userCity = null;
-
-
-    NumberPicker noPicker = null;
+    private Switch onNewSwitch;
+    private Switch onStatusSwitch;
+    private NumberPicker onHypePicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +39,11 @@ public class Settings extends Activity {
         currentUser.fetchInBackground();
 
         userCity = (String) getIntent().getExtras().get("city");
-        noPicker = (NumberPicker) findViewById(R.id.on_number);
-        noPicker.setMaxValue(100);
-        noPicker.setMinValue(0);
-        noPicker.setWrapSelectorWheel(false);
-        noPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-        userId = currentUser.getObjectId();
+        onHypePicker = (NumberPicker) findViewById(R.id.on_number);
+        onHypePicker.setMaxValue(100);
+        onHypePicker.setMinValue(0);
+        onHypePicker.setWrapSelectorWheel(false);
+        onHypePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 
         Button doneButton = (Button) findViewById(R.id.doneButton);
         doneButton.setOnClickListener(new View.OnClickListener() {
@@ -84,14 +74,12 @@ public class Settings extends Activity {
         super.onStart();
 
         //To automatically set on the first and second switches if necessary
-        onNew = currentUser.getBoolean("onNew");
-        onStatus = currentUser.getBoolean("onStatus");
-        onHype = currentUser.getInt("onHype");
-
+        Boolean onNew = currentUser.getBoolean("onNew");
+        Boolean onStatus = currentUser.getBoolean("onStatus");
+        Integer onHype = currentUser.getInt("onHype");
 
         onStatusSwitch = (Switch) findViewById(R.id.first_notification);
         onNewSwitch = (Switch) findViewById(R.id.second_notification);
-        onHypePicker = (NumberPicker) findViewById(R.id.on_number);
         profilePicture = (ImageView) findViewById(R.id.userProfilePic);
 
         onNewSwitch.setChecked(onNew);
@@ -100,37 +88,6 @@ public class Settings extends Activity {
 
         setContent();
         setUpSwitches();
-    }
-
-    private void setUpSwitches() {
-
-        onNewSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("On status", "User changed on new notification to " + onNewSwitch.isChecked());
-                currentUser.put("onNew", onNewSwitch.isChecked());
-            }
-        });
-
-        onStatusSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("On status", "User changed on status notification to " + onStatusSwitch.isChecked());
-                currentUser.put("onStatus", onStatusSwitch.isChecked());
-            }
-        });
-
-        onHypePicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                Log.d("On hype", "User changed their hype number to " + onHypePicker.getValue());
-                if(onHypePicker.getValue() == 0) {
-                    currentUser.put("onHype", -1);
-                } else {
-                    currentUser.put("onHype", onHypePicker.getValue());
-                }
-            }
-        });
     }
 
     private void setContent() {
@@ -142,15 +99,9 @@ public class Settings extends Activity {
                 @Override
                 public void done(byte[] data, ParseException e) {
 
-                    if (e == null)
-                    {
+                    if (e == null) {
                         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                        RoundImage roundImage = new RoundImage(bmp);
                         profilePicture.setImageBitmap(bmp);
-                    }
-                    else
-                    {
-                        // Set a default profile picture
                     }
 
                 }
@@ -188,6 +139,37 @@ public class Settings extends Activity {
 
         // Set the name
         name.setText(currentUser.getString("first_name") + " " + currentUser.getString("last_name"));
+    }
+
+    private void setUpSwitches() {
+
+        onNewSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("On status", "User changed on new notification to " + onNewSwitch.isChecked());
+                currentUser.put("onNew", onNewSwitch.isChecked());
+            }
+        });
+
+        onStatusSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("On status", "User changed on status notification to " + onStatusSwitch.isChecked());
+                currentUser.put("onStatus", onStatusSwitch.isChecked());
+            }
+        });
+
+        onHypePicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                Log.d("On hype", "User changed their hype number to " + onHypePicker.getValue());
+                if (onHypePicker.getValue() == 0) {
+                    currentUser.put("onHype", -1);
+                } else {
+                    currentUser.put("onHype", onHypePicker.getValue());
+                }
+            }
+        });
     }
 
     public void openHype(View view){
@@ -244,38 +226,4 @@ public class Settings extends Activity {
         setResult(2);
         super.onDestroy();
     }
-
-    /*https://parse.com/questions/updating-a-field-without-retrieving-the-object-first
-    @Override
-    public void onStop(){
-        super.onStop();
-
-        //Check status of switches upon activity close
-        Switch oneSwitch = (Switch) findViewById(R.id.first_notification);
-        final Boolean finalFirstCheck = (Boolean) oneSwitch.isChecked();
-
-        Switch twoSwitch = (Switch) findViewById(R.id.second_notification);
-        final Boolean finalSecondCheck = (Boolean) twoSwitch.isChecked();
-
-        if (initialFirstCheck != finalFirstCheck) {
-            StringBuilder success = new StringBuilder(getResources().getString(R.string.success));
-            Toast.makeText(Settings.this, success.toString(), Toast.LENGTH_LONG).show();
-            String currentUser = new String(String.valueOf(ParseUser.getCurrentUser()));
-
-            ParseQuery<ParseObject> querySetting1 = ParseQuery.getQuery("User");
-            querySetting1.whereEqualTo("user", currentUser);
-            querySetting1.findInBackground(new FindCallback<ParseObject>() {
-                public void done(List<ParseObject> setting1, ParseException e) {
-                    if (e == null) {
-                        for (ParseObject userObject : setting1) {
-                            String userID = userObject.getObjectId();
-                            ParseObject point = ParseObject.createWithoutData("User", userID);
-                            point.put("onStatus", finalFirstCheck);
-                        }
-                    } else {
-                    }
-                }
-            });
-        }
-    }*/
 }

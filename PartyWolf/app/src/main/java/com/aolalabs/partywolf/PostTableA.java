@@ -114,10 +114,14 @@ public class PostTableA extends Activity implements OnClickListener{
                 else{
                     if (adapter.getClass().equals(MyListAdapter.class)) {
                         MyListAdapter tmpAdapter = (MyListAdapter) adapter;
-                        if (!tmpAdapter.getEvents().equals(dataManager.getEvents()) && !tmpAdapter.getEvents().equals(dataManager.getSortedEvents())) {
-                            Log.d("Post table", "refreshing");
-                            Log.d("Post table", "" + (dataManager.getEvents().size()));
-                            populateListView(dataManager.getEvents());
+                        if(tmpAdapter.getEvents().size() != dataManager.getEvents().size()) {
+                            if(dateView) {
+                                populateListView(dataManager.getEvents());
+                                registerClickCallback();
+                            } else {
+                                populateListView(dataManager.getSortedEvents());
+                                registerClickCallback();
+                            }
                         }
                     }
                 }

@@ -88,7 +88,7 @@ public class PostDataManager {
         userLocationManager.getLocation();
     }
 
-    public void getData() {
+    private void getData() {
         try {
             loadUpvoteData();
             loadEventData();
@@ -147,12 +147,16 @@ public class PostDataManager {
     }
 
     public ArrayList<Event> getEvents() {
-        return (ArrayList<Event>) this.events;
+        return this.events;
     }
 
     public ArrayList<Event> getSortedEvents() {
-        sortEvents();
-        return this.sortedEvents;
+        if(this.events.size() != this.sortedEvents.size()) {
+            sortEvents();
+            return this.sortedEvents;
+        } else {
+            return this.sortedEvents;
+        }
     }
 
     public ArrayList<ParseObject> getParseEvents() {
@@ -274,6 +278,7 @@ public class PostDataManager {
                 public void done(ParseException e) {
                     if (e != null)
                         Log.d("Object saving error", e.toString());
+                    Log.d("Upvote event", "Event updated");
                 }
             });
         }
@@ -289,7 +294,7 @@ public class PostDataManager {
                 public void done(ParseException e) {
                     if (e != null)
                         Log.d("User saving error", e.toString());
-                    System.out.println("User updated");
+                    Log.d("Upvote event", "User updated");
                 }
             });
         }

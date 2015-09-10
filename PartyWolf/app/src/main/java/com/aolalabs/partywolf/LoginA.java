@@ -305,7 +305,7 @@ public class LoginA extends Activity implements OnClickListener {
                                 e.printStackTrace();
                             }
 
-                            currentUser.put("banned", false);
+                            currentUser.put("banned", "false");
                             currentUser.put("confirmed", false);
                             currentUser.put("score", 0);
                             currentUser.put("leader", false);
@@ -348,7 +348,7 @@ public class LoginA extends Activity implements OnClickListener {
         request.setParameters(parameters);
         request.executeAsync();
 
-        boolean isVerified = false;
+        boolean isVerified;
         String isBanned = "false";
         String wolfPack = "";
 
@@ -402,7 +402,6 @@ public class LoginA extends Activity implements OnClickListener {
 
             try {
                 ParseObject university = currentUser.getParseObject("university");
-                ParseObject realUniversity = ParseObject.createWithoutData("Universities", university.getObjectId());
                 ParseQuery uniQuery = ParseQuery.getQuery("Universities");
                 uniQuery.whereEqualTo("objectId", university.getObjectId());
 
@@ -448,7 +447,7 @@ public class LoginA extends Activity implements OnClickListener {
             Bitmap img;
 
             try {
-                response = (HttpResponse)client.execute(request);
+                response = client.execute(request);
                 HttpEntity entity = response.getEntity();
                 BufferedHttpEntity bufferedEntity = new BufferedHttpEntity(entity);
                 InputStream inputStream = bufferedEntity.getContent();
