@@ -114,7 +114,9 @@ public class PostTableA extends Activity implements OnClickListener{
                 else{
                     if (adapter.getClass().equals(MyListAdapter.class)) {
                         MyListAdapter tmpAdapter = (MyListAdapter) adapter;
-                        if (!tmpAdapter.getEvents().equals(dataManager.getEvents())) {
+                        if (!tmpAdapter.getEvents().equals(dataManager.getEvents()) && !tmpAdapter.getEvents().equals(dataManager.getSortedEvents())) {
+                            Log.d("Post table", "refreshing");
+                            Log.d("Post table", "" + (dataManager.getEvents().size()));
                             populateListView(dataManager.getEvents());
                         }
                     }
@@ -449,7 +451,6 @@ public class PostTableA extends Activity implements OnClickListener{
                 v.setBackgroundResource(R.drawable.selection_bg);
                 findViewById(R.id.dateOption).setBackgroundResource(R.drawable.selection_blank_bg);
                 dateView = false;
-                //sortByHype();
                 populateListView(dataManager.getSortedEvents());
                 registerClickCallback();
                 break;
@@ -614,15 +615,12 @@ public class PostTableA extends Activity implements OnClickListener{
 
     public void saveUser(){
         try {
-            if(currentUser!=null){
-                currentUser.fetchIfNeededInBackground();
-                currentUser.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        Log.d("saveUser", "User saved");
-                    }
-                });
-            }
+            currentUser.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    Log.d("saveUser", "user saved");
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }

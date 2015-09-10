@@ -31,7 +31,6 @@ public class Add extends FragmentActivity {
     private CustomEditText emoji;
     private CustomEditText host;
     private CustomEditText fee;
-//    private int day,month,year, hour, minute;
     private Date eventDate;
     private ParseGeoPoint location;
     private TextView dateText;
@@ -85,13 +84,6 @@ public class Add extends FragmentActivity {
                 dateText.setVisibility(View.VISIBLE);
                 dateText.setText(mFormatter.format(date));
                 eventDate = date;
-            }
-
-            // Optional cancel listener
-            @Override
-            public void onDateTimeCancel()
-            {
-
             }
 
         };
@@ -153,14 +145,6 @@ public class Add extends FragmentActivity {
             validationError = true;
             validationErrorMessage.append(getResources().getString(R.string.enter_a_host));
         }
-
-//        if (fee.getText().toString().trim().length() < 5 ) {
-//            if (validationError) {
-//                validationErrorMessage.append(getResources().getString(R.string.and));
-//            }
-//            validationError = true;
-//            validationErrorMessage.append(getResources().getString(R.string.enter_a_fee));
-//        }
 
         validationErrorMessage.append(getResources().getString(R.string.period));
 
@@ -233,8 +217,6 @@ public class Add extends FragmentActivity {
 
     public void setListeners() {
 
-        //bottomHeight = 500;
-
         View.OnFocusChangeListener listener = new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -242,6 +224,12 @@ public class Add extends FragmentActivity {
                     keyboardOpened();
                 } else if(!hasFocus){
                     keyboardClosed();
+                }
+
+                if(v.equals(eventDescription)) {
+                    eventDescription.setHint("");
+                } else {
+                    eventDescription.setHint(R.string.event_description);
                 }
             }
         };
@@ -283,10 +271,8 @@ public class Add extends FragmentActivity {
     }
 
     public void keyboardOpened() {
-        System.out.println("I'm supposed to be doing something...");
         ViewGroup.LayoutParams eventDescriptionParams = eventDescription.getLayoutParams();
         eventDescriptionParams.height -= bottomHeight;
-        System.out.println(bottomHeight);
         eventDescription.setLayoutParams(eventDescriptionParams);
         keyboardActive = true;
     }
@@ -294,19 +280,21 @@ public class Add extends FragmentActivity {
     public void keyboardClosed() {
         ViewGroup.LayoutParams eventDescriptionParams = eventDescription.getLayoutParams();
         eventDescriptionParams.height = eventDescriptionHeight;
-        System.out.println(bottomHeight);
         eventDescription.setLayoutParams(eventDescriptionParams);
         keyboardActive = false;
     }
 
     public void setLayoutParameters() {
+
+        // Figure how to account for different keyboard sizes
+
         int windowHeight = getWindowManager().getDefaultDisplay().getHeight();
         int topBarHeight = findViewById(R.id.topBar).getLayoutParams().height;
         int eventNameTitleHeight = findViewById(R.id.event_name_title).getLayoutParams().height;
         int event_descriptionHeight = findViewById(R.id.event_description).getLayoutParams().height;
 
         eventDescriptionHeight = eventDescription.getLayoutParams().height;
-        bottomHeight = 176 + windowHeight - (topBarHeight+eventNameTitleHeight + event_descriptionHeight);
+        bottomHeight = 120 + windowHeight - (topBarHeight+eventNameTitleHeight + event_descriptionHeight);
         //bottomHeight = 325;
     }
 

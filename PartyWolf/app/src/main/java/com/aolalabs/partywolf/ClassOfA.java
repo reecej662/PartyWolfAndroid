@@ -42,7 +42,6 @@ public class ClassOfA extends Activity {
 
     public void continueButton(View v) {
         System.out.println("User is class of " + classOf);
-        currentUser.put("classOf", classOf);
         currentUser.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -66,6 +65,7 @@ public class ClassOfA extends Activity {
                     tmpView.setGravity(Gravity.LEFT);
                     String tmpClassOf = tmpView.getText().toString();
                     classOf = Integer.valueOf(tmpClassOf);
+                    currentUser.put("classOf", classOf);
                 } else {
                     tmpView.setGravity(Gravity.RIGHT);
                 }

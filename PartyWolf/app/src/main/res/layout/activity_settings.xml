@@ -482,7 +482,7 @@
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Made with ♥ by AloaLabs (Beta Version 1.3)"
+            android:text="Made with ♥ by AloaLabs (Beta Version 1.3.2)"
             android:layout_marginBottom="15dp"
             android:textColor="@color/slate_gray"
             android:paddingLeft="18sp"

@@ -178,7 +178,17 @@ public class Settings extends Activity {
             }
         });
 
-        location.setText(userCity);
+        if(userCity.equals("")) {
+            try{
+                location.setText(currentUser.getString("currentCity"));
+            } catch (Exception e) {
+                e.printStackTrace();
+                location.setText("Couldn't determine city");
+            }
+        } else {
+            location.setText(userCity);
+        }
+
         classYear.setText("Class of " + currentUser.getNumber("classOf").toString()) ;
 
         // Set the name

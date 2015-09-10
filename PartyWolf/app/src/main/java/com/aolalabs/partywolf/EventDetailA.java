@@ -108,7 +108,7 @@ public class EventDetailA extends Activity {
         // Chart step 2
         getUserRelation();
 
-        SimpleDateFormat dateString = new SimpleDateFormat("MMM d, yyyy (EEE) • h:ma");
+        SimpleDateFormat dateString = new SimpleDateFormat("MMM d, yyyy (EEE) • h:mma");
         String formattedTime = dateString.format(event.getDate());
         date.setText(formattedTime);
 

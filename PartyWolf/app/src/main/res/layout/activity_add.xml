@@ -73,7 +73,7 @@
 
         <com.aolalabs.partywolf.CustomEditText
             android:layout_width="match_parent"
-            android:layout_height="320dp"
+            android:layout_height="300dp"
             android:hint="@string/event_description"
             android:id="@+id/event_description"
             android:textColorHint="#d3d3d3"
@@ -91,7 +91,7 @@
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="50dp"
+            android:layout_height="45dp"
             android:orientation="horizontal"
             android:layout_gravity="center_vertical"
             android:id="@+id/detail_container1"
@@ -137,7 +137,7 @@
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="50dp"
+            android:layout_height="45dp"
             android:orientation="horizontal"
             android:id="@+id/detail_container2">
 

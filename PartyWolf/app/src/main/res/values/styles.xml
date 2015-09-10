@@ -116,7 +116,7 @@
         <item name="cet_spanSpacing">4dp</item>
     </style>
 
-    <style name="AppTheme" parent="android:Theme.Holo.Light.NoActionBar.Fullscreen">
+    <style name="AppTheme" parent="android:Theme.Holo.Light.NoActionBar">
         <!-- Customize your theme here. -->
 
         <!-- colorPrimary is used for the default action bar background -->

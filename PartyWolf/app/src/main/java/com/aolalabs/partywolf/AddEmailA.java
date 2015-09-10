@@ -50,7 +50,6 @@ public class AddEmailA extends Activity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-
         // Checks whether a hardware keyboard is available
         if (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_NO) {
             Button confirmationButton = (Button) findViewById(R.id.confirmationButton);
