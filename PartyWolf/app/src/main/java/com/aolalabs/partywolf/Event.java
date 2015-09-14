@@ -8,7 +8,9 @@ import java.util.Date;
 
 /**
  * Created by reecejackson on 8/18/15.
+ *
  */
+
 public class Event implements Serializable, Comparable<Event> {
     private String objectID = "";
     private String title = "No title";
@@ -17,55 +19,12 @@ public class Event implements Serializable, Comparable<Event> {
     private int numUpvotes = 0;
     private String voteStatus = "none";
     private Date date = new Date();
-    private String weekDay = "default";
     private boolean upvoted = false;
-
-    public boolean isUpvoted() {
-        return upvoted;
-    }
-
-    public void setUpvoted(boolean upvoted) {
-        this.upvoted = upvoted;
-    }
-
-    public String getWeekDay() {
-        return weekDay;
-    }
-
-    public void setWeekDay(String weekDay) {
-        this.weekDay = weekDay;
-    }
-
-    public Event(String objectID, String title, String desc, String emoji, int numUpvotes, String voteStatus,
-                 String host, String fee, String dateOfEvent, String dayOfWeek) {
-        this.objectID = objectID;
-        this.title = title;
-        this.desc = desc;
-        this.emoji = emoji;
-        this.numUpvotes = numUpvotes;
-        this.voteStatus = voteStatus;
-        this.host = host;
-        if(!fee.equals("$0.00")) {
-            this.fee = fee;
-        }
-        this.dateOfEvent = dateOfEvent;
-        this.dayOfWeek = dayOfWeek;
-    }
-
+    private String weekDay = "default";
     private String host = "(Test host)";
     private String fee = "(Free)";
     private String dateOfEvent = "";
     private String dayOfWeek = "";
-
-    public Event() {}
-
-    public Event(String title, String emoji, int numUpvotes, String host, String fee) {
-        this.title = title;
-        this.emoji = emoji;
-        this.numUpvotes = numUpvotes;
-        this.host = host;
-        this.fee = fee;
-    }
 
     public Event(ParseObject object) {
         this.objectID = object.getObjectId();
@@ -84,6 +43,32 @@ public class Event implements Serializable, Comparable<Event> {
 
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
         this.weekDay =  sdf.format(this.date);
+    }
+
+    public Event(String objectID, String title, String desc, String emoji, int numUpvotes, String voteStatus,
+                 String host, String fee, String dateOfEvent, String dayOfWeek) {
+        this.objectID = objectID;
+        this.title = title;
+        this.desc = desc;
+        this.emoji = emoji;
+        this.numUpvotes = numUpvotes;
+        this.voteStatus = voteStatus;
+        this.host = host;
+        if (!fee.equals("$0.00")) {
+            this.fee = fee;
+        }
+        this.dateOfEvent = dateOfEvent;
+        this.dayOfWeek = dayOfWeek;
+    }
+
+    public Event() {}
+
+    public Event(String title, String emoji, int numUpvotes, String host, String fee) {
+        this.title = title;
+        this.emoji = emoji;
+        this.numUpvotes = numUpvotes;
+        this.host = host;
+        this.fee = fee;
     }
 
     public Date getDate(){
@@ -141,7 +126,6 @@ public class Event implements Serializable, Comparable<Event> {
     }
 
     public String getObjectID() {
-
         return objectID;
     }
 
@@ -181,6 +165,10 @@ public class Event implements Serializable, Comparable<Event> {
         return dayOfWeek;
     }
 
+    public String getWeekDay() {
+        return weekDay;
+    }
+
     @Override
     public String toString() {
         return "Event{" +
@@ -204,6 +192,14 @@ public class Event implements Serializable, Comparable<Event> {
             return 1;
         } else {
             return 0;
+        }
+    }
+
+    public boolean equals(Event other) {
+        if(this.objectID.equals(other.objectID)) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

@@ -231,25 +231,26 @@ public class PostDataManager {
         ParseQuery<ParseObject> upvoteQuery = upvoteRelation.getQuery();
         upvotesLoaded = false;
 
-        try {
-            upvoteQuery.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(List<ParseObject> list, ParseException e) {
+        upvoteQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                try {
                     if (list != null) {
+
                         for (ParseObject object : list) {
                             upvoteEvents.add(new Event(object));
                             upvoteObjects.add(object);
                         }
                     }
+                } catch (Exception ex) {
+                    e.printStackTrace();
+                } finally {
+                    Log.d("Data Manager", "Upvotes Loaded");
+                    upvotesLoaded = true;
+                    callListenerLoaded();
                 }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            Log.d("Data Manager", "Upvotes Loaded");
-            upvotesLoaded = true;
-            callListenerLoaded();
-        }
+            }
+        });
     }
 
     // Methods to handle the voting/unvoting of events
@@ -305,7 +306,7 @@ public class PostDataManager {
         // Change the values for the locally stored Event
         for (Event event : events) {
             if (event.getObjectID().equals(object.getObjectId())) {
-                Event upvotedEvent = userUpvoted(event);
+                Event upvotedEvent = getUpvotedEvent(event);
                 event.unvote();
                 upvoteEvents.remove(upvotedEvent);
             }
@@ -350,13 +351,23 @@ public class PostDataManager {
 
     }
 
-    public Event userUpvoted(Event event) {
+    public Event getUpvotedEvent(Event event) {
         for(Event upvoted : upvoteEvents) {
             if(event.getObjectID().equals(upvoted.getObjectID())){
                 return upvoted;
             }
         }
         return null;
+    }
+
+    public boolean userUpvoted(Event event) {
+        for(Event upvoted : upvoteEvents) {
+            if(event.getObjectID().equals(upvoted.getObjectID())) {
+                return true;
+            }
+        }
+        Log.d("userUpvoted", "User didn't upvote event. Upvote events size: " + this.upvoteEvents.size());
+        return false;
     }
 
     // Interface and method to set up DataListener

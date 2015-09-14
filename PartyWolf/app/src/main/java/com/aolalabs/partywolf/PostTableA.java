@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -84,7 +85,6 @@ public class PostTableA extends Activity implements OnClickListener{
                 currentUser.fetchInBackground(new GetCallback<ParseObject>() {
                     @Override
                     public void done(ParseObject parseObject, ParseException e) {
-                        //getLocation()
                         setUpActivity();
                     }
                 });
@@ -109,6 +109,8 @@ public class PostTableA extends Activity implements OnClickListener{
         dataManager.setDataListener(new PostDataManager.DataListener() {
             @Override
             public void onDataLoaded() {
+                Log.d("Post table", "onDataLoaded called");
+                Log.d("Post table", "Upvote events size: " + dataManager.upvoteObjects.size());
                 if(firstLoad)
                     populateListView(dataManager.events);
                 else{
@@ -128,8 +130,6 @@ public class PostTableA extends Activity implements OnClickListener{
                 firstLoad = false;
                 registerClickCallback();
 
-                findViewById(R.id.wolfSpinner).setVisibility(View.VISIBLE);
-                findViewById(R.id.glassesSpinner).setVisibility(View.VISIBLE);
                 Log.d("Post Table", "Data loading");
             }
         });
@@ -248,7 +248,7 @@ public class PostTableA extends Activity implements OnClickListener{
             // Default case
             upvotes.setTextColor(Color.rgb(0, 0, 0));
 
-            if(dataManager.userUpvoted(currentEvent) != null) {
+            if(dataManager.userUpvoted(currentEvent)) {
                 upvotes.setTextColor(Color.rgb(0, 169, 255));
                 button.setBackgroundResource(R.drawable.bluevote);
                 button.setText("unvote");
@@ -477,8 +477,12 @@ public class PostTableA extends Activity implements OnClickListener{
         RotateLoading rotateLoading = (RotateLoading) loadingDialog.findViewById(R.id.rotateloading);
         rotateLoading.start();
 
+        DisplayMetrics metrics = this.getResources().getDisplayMetrics();
+        float dp = 250f;
+        int pixels = (int) (metrics.density * dp + 0.5f);
+
         final Window window = loadingDialog.getWindow();
-        window.setLayout(500, 500);
+        window.setLayout(pixels, pixels);
         window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
@@ -576,6 +580,7 @@ public class PostTableA extends Activity implements OnClickListener{
 
             @Override
             public void onUIRefreshPrepare(PtrFrameLayout frameLayout) {
+                //Log.d("UIRefresh prepare", "Getting here");
                 wolf.setVisibility(View.VISIBLE);
                 glasses.setVisibility(View.VISIBLE);
                 findViewById(R.id.emptyTextView).setVisibility(View.GONE);

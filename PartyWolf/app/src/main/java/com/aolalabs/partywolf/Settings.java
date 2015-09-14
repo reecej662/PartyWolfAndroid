@@ -49,7 +49,7 @@ public class Settings extends Activity {
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(onHypePicker.getValue() == 0) {
+                if (onHypePicker.getValue() == 0) {
                     currentUser.put("onHype", -1);
                 } else {
                     currentUser.put("onHype", onHypePicker.getValue());
@@ -117,12 +117,17 @@ public class Settings extends Activity {
 
         final ParseObject universityPointer = (ParseObject) currentUser.get("university");
 
-        universityPointer.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject parseObject, ParseException e) {
-                school.setText(universityPointer.getString("name"));
-            }
-        });
+        try {
+            universityPointer.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject parseObject, ParseException e) {
+                    school.setText(universityPointer.getString("name"));
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            school.setText("School name not found");
+        }
 
         if(userCity.equals("")) {
             try{
